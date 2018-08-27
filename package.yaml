@@ -1,0 +1,94 @@
+name: stellar-parser
+version: 0.1.0.0
+category: parser
+author: DSQ AG
+maintainer: engineering@dstoq.exchange
+copyright: DSQ AG
+license: BSD3 # TODO: what is the proper license?
+github: dstoq/stellar-parser
+extra-source-files:
+- README.md
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wredundant-constraints
+# - -Werror
+- -Wimplicit-prelude
+- -Wtabs
+- -Wmissing-local-signatures
+- -fhelpful-errors
+- -fprint-expanded-synonyms
+
+default-extensions:
+- ApplicativeDo
+- BangPatterns
+- ConstraintKinds
+- DataKinds
+- DefaultSignatures
+- DeriveFoldable
+- DeriveFunctor
+- DeriveGeneric
+- DeriveLift
+- DeriveTraversable
+- DerivingStrategies
+- DisambiguateRecordFields
+- DuplicateRecordFields
+- EmptyCase
+- ExistentialQuantification
+- FlexibleContexts
+- FlexibleInstances
+- FunctionalDependencies
+- GADTs
+- GeneralizedNewtypeDeriving
+- InstanceSigs
+- KindSignatures
+- LambdaCase
+- MultiParamTypeClasses
+- MultiWayIf
+- NamedFieldPuns
+- NoImplicitPrelude
+- OverloadedStrings
+- PatternSynonyms
+- RankNTypes
+- ScopedTypeVariables
+- StandaloneDeriving
+- TupleSections
+- TypeApplications
+- TypeFamilies
+- TypeFamilyDependencies
+- TypeOperators
+
+library:
+  source-dirs: src
+  dependencies:
+  - base >= 4.9 && < 5
+  - protolude
+  - bytestring
+  - binary
+  - largeword
+  - semigroups
+  exposed-modules:
+  - Stellar.Parser
+#
+# tests:
+#   spec:
+#     main: Driver.hs
+#     source-dirs:
+#     - test
+#     dependencies:
+#     - user
+#     - base >= 4.9 && < 5
+#     - bytestring
+#     - microlens-platform
+#     - protolude
+#     - postgresql-simple
+#     - postgresql-simple-migration
+#     - resource-pool
+#     - tasty
+#     - tasty-discover
+#     - tasty-hedgehog
+#     - hedgehog
+#     - text
