@@ -24,7 +24,7 @@ putEnum = putWord32be . fromIntegral . fromEnum
 padding :: Int -> Int -> Int
 padding p l = m - l
   where
-  m = p * if r == 0 then q else (q + 1)
+  m = p * if r == 0 then q else q + 1
   (q, r) = l `quotRem` p
 
 newtype Padded a
@@ -62,4 +62,4 @@ instance Binary a => Binary (Padded (Maybe a)) where
     w <- getWord32be
     case w of
       0 -> pure $ Padded Nothing
-      _ -> liftM (Padded . Just) get
+      _ -> Padded . Just <$> get

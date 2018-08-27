@@ -228,12 +228,16 @@ data PathPaymentOp
   , destAsset   :: Asset      -- what they end up with
   , destAmount  :: Int64      -- amount they end up with
   , path        :: [Asset]    -- additional hops it must go through to get there
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic)
 
-data OfferId
-  = NewOffer
-  | ExistingOffer Word64
-  deriving (Eq, Show)
+instance Binary PathPaymentOp
+
+
+newtype OfferId
+  = OfferId
+  { unOfferId :: Word64
+  } deriving (Eq, Show, Binary)
+
 
 data ManageOfferOp
   = ManageOfferOp

@@ -16,7 +16,7 @@ import           System.Exit           (exitFailure)
 main :: IO ()
 main = ifM runProperties exitSuccess exitFailure
 
-data Checkable
+newtype Checkable
   = Checkable (forall a. (Binary a, Show a, Eq a) => Gen a -> Property)
 
 data Genable
@@ -29,7 +29,7 @@ runProperties = checkParallel $ Group "Binary Properties" $
   where
 
   mkProp :: (String, Checkable) -> Genable -> (PropertyName, Property)
-  mkProp (checkName, (Checkable f)) (Genable (typeName, g)) =
+  mkProp (checkName, Checkable f) (Genable (typeName, g)) =
      (fromString $ checkName <> " " <> typeName, f g)
 
   checks :: [(String, Checkable)]
@@ -57,6 +57,9 @@ runProperties = checkParallel $ Group "Binary Properties" $
     , Genable ("Hash",           genHash)
     , Genable ("Memo",           genMemo)
     , Genable ("Signer",         genSigner)
+    , Genable ("PaymentOp",      genPaymentOp)
+    , Genable ("PathPaymentOp",  genPathPaymentOp)
+    , Genable ("OfferId",        genOfferId)
     ]
 
 roundtrip :: Checkable
@@ -143,3 +146,21 @@ genCreateAccountOp :: Gen CreateAccountOp
 genCreateAccountOp = CreateAccountOp
   <$> genPublicKey
   <*> Gen.expInt64
+
+genPaymentOp :: Gen PaymentOp
+genPaymentOp = PaymentOp
+  <$> genPublicKey
+  <*> genAsset
+  <*> Gen.expInt64
+
+genPathPaymentOp :: Gen PathPaymentOp
+genPathPaymentOp = PathPaymentOp
+  <$> genAsset
+  <*> Gen.expInt64
+  <*> genPublicKey
+  <*> genAsset
+  <*> Gen.expInt64
+  <*> Gen.list (Range.linear 0 5) genAsset
+
+genOfferId :: Gen OfferId
+genOfferId = OfferId <$> Gen.expWord64
