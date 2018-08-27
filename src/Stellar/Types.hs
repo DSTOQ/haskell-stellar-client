@@ -1,15 +1,43 @@
+{-# LANGUAGE StrictData #-}
+
 module Stellar.Types where
 
-import           Data.LargeWord     (Word256, Word96)
-import           Data.List.NonEmpty (NonEmpty)
-import           Data.Word          (Word32)
-import           Prelude            (String)
-import           Protolude
+import           Data.Binary.Extended (Binary, get, getEnum, put, putEnum)
+import           Data.Binary.Get      (Get)
+import           Data.LargeWord       (Word256, Word96)
+import           Data.List.NonEmpty   (NonEmpty)
+import           Data.Word            (Word32)
+import           Prelude              (String)
+import           Protolude            hiding (get, put)
+
+data CryptoKeyType
+  = KeyTypeEd25519
+  | KeyTypePreAuthTx
+  | KeyTypeHashX
+  deriving (Eq, Show, Enum, Bounded)
+
+instance Binary CryptoKeyType where
+  get = getEnum
+  put = putEnum
+
+
+data PublicKeyType
+  = PublicKeyTypeEd25519
+  deriving (Eq, Show, Enum, Bounded)
+
+instance Binary PublicKeyType where
+  get = getEnum
+  put = putEnum
+
 
 newtype PublicKey
   = PublicKeyEd25519
   { unPublicKeyEd25519 :: Word256
   } deriving (Eq, Show)
+
+instance Binary PublicKey where
+  get = (get :: Get PublicKeyType) >> fmap PublicKeyEd25519 get
+  put k = put PublicKeyTypeEd25519 >> put (unPublicKeyEd25519 k)
 
 data SignerKey
   = SignerKeyEd25519 Word256
