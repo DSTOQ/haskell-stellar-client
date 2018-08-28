@@ -1,10 +1,10 @@
-name: stellar-types
+name: stellar-core
 version: 0.1.0.0
 author: DSQ AG
 maintainer: engineering@dstoq.exchange
 copyright: DSQ AG
 license: BSD3 # TODO: what is the proper license?
-github: dstoq/stellar-types
+github: dstoq/haskell-stellar-core
 extra-source-files:
 - README.md
 
@@ -71,6 +71,7 @@ library:
   - semigroups
   exposed-modules:
   - Stellar.Types
+  - Data.Binary.Extended
 
 tests:
   spec:
@@ -83,5 +84,5 @@ tests:
     - bytestring
     - largeword
     - protolude
-    - stellar-types
+    - stellar-core
     - hedgehog

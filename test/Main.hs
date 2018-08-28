@@ -1,9 +1,10 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE ExplicitForAll            #-}
+{-# LANGUAGE UnicodeSyntax             #-}
 
 module Main where
 
-import           Data.Binary
+import           Data.Binary.Extended
 import qualified Data.ByteString.Lazy  as BL
 import           Data.String           (String, fromString)
 import           Hedgehog
@@ -17,59 +18,73 @@ main :: IO ()
 main = ifM runProperties exitSuccess exitFailure
 
 newtype Checkable
-  = Checkable (forall a. (Binary a, Show a, Eq a) => Gen a -> Property)
+  = Checkable (∀ a. (Binary a, Show a, Eq a) => Gen a -> Property)
 
 data Genable
-  = forall a . (Binary a, Show a, Eq a)
+  = ∀ a . (Binary a, Show a, Eq a)
   => Genable (String, Gen a)
 
 runProperties :: IO Bool
 runProperties = checkParallel $ Group "Binary Properties" $
   mkProp <$> checks <*> gens
-  where
 
-  mkProp :: (String, Checkable) -> Genable -> (PropertyName, Property)
-  mkProp (checkName, Checkable f) (Genable (typeName, g)) =
-     (fromString $ checkName <> " " <> typeName, f g)
+mkProp :: (String, Checkable) -> Genable -> (PropertyName, Property)
+mkProp (checkName, Checkable f) (Genable (typeName, g)) =
+   (fromString $ checkName <> " " <> typeName, f g)
 
-  checks :: [(String, Checkable)]
-  checks =
-    [ ("Roundtrip",     roundtrip)
-    , ("Multiple of 4", isMultiple4)
-    ]
+checks :: [(String, Checkable)]
+checks =
+  [ ("Roundtrip",     roundtrip)
+  , ("Multiple of 4", isMultiple4)
+  ]
 
-  gens :: [Genable]
-  gens =
-    [ Genable ("PublicKeyType",  genPublicKeyType)
-    , Genable ("PublicKey",      genPublicKey)
-    , Genable ("SignerKeyType",  genSignerKeyType)
-    , Genable ("SignerKey",      genSignerKey)
-    , Genable ("Threshold",      genThreshold)
-    , Genable ("AssetType",      genAssetType)
-    , Genable ("AssetCode4",     genAssetCode4)
-    , Genable ("AssetCode12",    genAssetCode12)
-    , Genable ("DataValue",      genDataValue)
-    , Genable ("Asset",          genAsset)
-    , Genable ("Price",          genPrice)
-    , Genable ("Fee",            genFee)
-    , Genable ("SequenceNumber", genSequenceNumber)
-    , Genable ("TimeBounds",     genTimeBounds)
-    , Genable ("Hash",           genHash)
-    , Genable ("Memo",           genMemo)
-    , Genable ("Signer",         genSigner)
-    , Genable ("PaymentOp",      genPaymentOp)
-    , Genable ("PathPaymentOp",  genPathPaymentOp)
-    , Genable ("OfferId",        genOfferId)
-    ]
+gens :: [Genable]
+gens =
+  [ Genable ("PublicKeyType",        genPublicKeyType)
+  , Genable ("PublicKey",            genPublicKey)
+  , Genable ("SignerKeyType",        genSignerKeyType)
+  , Genable ("SignerKey",            genSignerKey)
+  , Genable ("Threshold",            genThreshold)
+  , Genable ("AssetType",            genAssetType)
+  , Genable ("AssetCode4",           genAssetCode4)
+  , Genable ("AssetCode12",          genAssetCode12)
+  , Genable ("Asset",                genAsset)
+  , Genable ("Price",                genPrice)
+  , Genable ("Fee",                  genFee)
+  , Genable ("SequenceNumber",       genSequenceNumber)
+  , Genable ("TimeBounds",           genTimeBounds)
+  , Genable ("Hash",                 genHash)
+  , Genable ("Memo",                 genMemo)
+  , Genable ("Signer",               genSigner)
+  , Genable ("PaymentOp",            genPaymentOp)
+  , Genable ("PathPaymentOp",        genPathPaymentOp)
+  , Genable ("OfferId",              genOfferId)
+  , Genable ("ManageOfferOp",        genManageOfferOp)
+  , Genable ("CreatePassiveOfferOp", genCreatePassiveOfferOp)
+  , Genable ("HomeDomain",           genHomeDomain)
+  , Genable ("SetOptionsOp",         genSetOptionsOp)
+  , Genable ("ChangeTrustOp",        genChangeTrustOp)
+  , Genable ("AllowTrustOp",         genAllowTrustOp)
+  , Genable ("DataValue",            genDataValue)
+  , Genable ("ManageDataOp",         genManageDataOp)
+  , Genable ("OperationType",        genOperationType)
+  , Genable ("Operation",            genOperation)
+  , Genable ("AccountOperation",     genAccountOperation)
+  , Genable ("Transaction",          genTransaction)
+  , Genable ("Signature",            genSignature)
+  , Genable ("SignatureHint",        genSignatureHint)
+  , Genable ("DecoratedSignature",   genDecoratedSignature)
+  , Genable ("TransactionEnvelope",  genTransactionEnvelope)
+  ]
 
 roundtrip :: Checkable
 roundtrip = Checkable $ \gen -> property $ do
   v <- forAll gen
-  case decodeOrFail (encode v) of
+  case (decodeOrFail . encode) v of
     Left _ -> failure
     Right (unconsumed, _, decoded) -> do
       decoded === v
-      assert $ BL.null unconsumed
+      BL.length unconsumed === 0
 
 isMultiple4 :: Checkable
 isMultiple4 = Checkable $ \gen -> property $ do
@@ -100,9 +115,6 @@ genAssetCode4 = AssetCode4 <$> Gen.expWord32
 genAssetCode12 :: Gen AssetCode12
 genAssetCode12 = AssetCode12 <$> Gen.word96 Range.exponentialBounded
 
-genDataValue :: Gen DataValue
-genDataValue = DataValue <$> Gen.bytes (Range.linear 0 64)
-
 genAssetType :: Gen AssetType
 genAssetType = Gen.enumBounded
 
@@ -131,7 +143,7 @@ genHash = Hash <$> Gen.word256 Range.exponentialBounded
 genMemo :: Gen Memo
 genMemo = Gen.choice
   [ pure MemoNone
-  , MemoText <$> Gen.text (Range.linear 0 27) Gen.ascii
+  , MemoText . Limited <$> Gen.bytes (Range.linear 0 27)
   , MemoId <$> Gen.expWord64
   , MemoHash <$> genHash
   , MemoReturn <$> genHash
@@ -164,3 +176,114 @@ genPathPaymentOp = PathPaymentOp
 
 genOfferId :: Gen OfferId
 genOfferId = OfferId <$> Gen.expWord64
+
+genManageOfferOp :: Gen ManageOfferOp
+genManageOfferOp = ManageOfferOp
+  <$> genAsset
+  <*> genAsset
+  <*> Gen.expInt64
+  <*> genPrice
+  <*> genOfferId
+
+genCreatePassiveOfferOp :: Gen CreatePassiveOfferOp
+genCreatePassiveOfferOp = CreatePassiveOfferOp
+  <$> genAsset
+  <*> genAsset
+  <*> Gen.expInt64
+  <*> genPrice
+
+genHomeDomain :: Gen HomeDomain
+genHomeDomain = HomeDomain . Limited <$> Gen.text (Range.linear 1 10) Gen.ascii
+
+genSetOptionsOp :: Gen SetOptionsOp
+genSetOptionsOp = SetOptionsOp
+  <$> Gen.maybe genPublicKey
+  <*> Gen.maybe Gen.expWord32
+  <*> Gen.maybe Gen.expWord32
+  <*> Gen.maybe Gen.expWord32
+  <*> Gen.maybe genThreshold
+  <*> Gen.maybe genThreshold
+  <*> Gen.maybe genThreshold
+  <*> Gen.maybe genHomeDomain
+  <*> Gen.maybe genSigner
+
+genChangeTrustOp :: Gen ChangeTrustOp
+genChangeTrustOp = ChangeTrustOp
+  <$> genAsset
+  <*> Gen.maybe Gen.expInt64
+
+genAllowTrustOp :: Gen AllowTrustOp
+genAllowTrustOp = AllowTrustOp
+  <$> genPublicKey
+  <*> Gen.either genAssetCode4 genAssetCode12
+  <*> Gen.bool
+
+genDataValue :: Gen DataValue
+genDataValue = DataValue . Limited <$> Gen.bytes (Range.linear 0 64)
+
+genManageDataOp :: Gen ManageDataOp
+genManageDataOp = ManageDataOp
+  <$> (Limited <$> Gen.text (Range.linear 1 10) Gen.ascii)
+  <*> Gen.maybe genDataValue
+
+genOperationType :: Gen OperationType
+genOperationType = Gen.element
+  [ OperationTypeCreateAccount
+  , OperationTypePayment
+  , OperationTypePathPayment
+  , OperationTypeManageOffer
+  , OperationTypeCreatePassiveOffer
+  , OperationTypeSetOptions
+  , OperationTypeChangeTrust
+  , OperationTypeAllowTrust
+  , OperationTypeAccountMerge
+  , OperationTypeInflation
+  , OperationTypeManageData
+  , OperationTypeBumpSequence
+  ]
+
+genOperation :: Gen Operation
+genOperation = Gen.choice
+  [ CreateAccount <$> genCreateAccountOp
+  , Payment <$> genPaymentOp
+  , PathPayment <$> genPathPaymentOp
+  , ManageOffer <$> genManageOfferOp
+  , CreatePassiveOffer <$> genCreatePassiveOfferOp
+  , SetOptions <$> genSetOptionsOp
+  , ChangeTrust <$> genChangeTrustOp
+  , AllowTrust <$> genAllowTrustOp
+  , AccountMerge <$> genPublicKey
+  , pure Inflation
+  , ManageData <$> genManageDataOp
+  , BumpSequence <$> genSequenceNumber
+  ]
+
+genAccountOperation :: Gen AccountOperation
+genAccountOperation = AccountOperation
+  <$> Gen.maybe genPublicKey
+  <*> genOperation
+
+genTransaction :: Gen Transaction
+genTransaction = Transaction
+  <$> genPublicKey
+  <*> genFee
+  <*> genSequenceNumber
+  <*> Gen.maybe genTimeBounds
+  <*> genMemo
+  <*> Gen.nonEmpty (Range.exponential 1 10) genAccountOperation
+
+genSignatureHint :: Gen SignatureHint
+genSignatureHint = SignatureHint <$> Gen.expWord32
+
+genSignature :: Gen Signature
+genSignature = Signature . Limited <$> Gen.bytes (Range.singleton 256)
+
+genDecoratedSignature :: Gen DecoratedSignature
+genDecoratedSignature = DecoratedSignature
+  <$> genSignatureHint
+  <*> genSignature
+
+genTransactionEnvelope :: Gen TransactionEnvelope
+genTransactionEnvelope = TransactionEnvelope
+  <$> genTransaction
+  <*> Gen.list (Range.linear 0 3) genDecoratedSignature

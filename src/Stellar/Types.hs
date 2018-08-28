@@ -1,14 +1,17 @@
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StrictData          #-}
+{-# LANGUAGE TupleSections       #-}
 
 module Stellar.Types where
 
+import           Control.Monad        (fail)
 import           Data.Binary.Extended
 import           Data.Binary.Get      (Get)
 import           Data.LargeWord       (Word256, Word96)
 import           Data.List.NonEmpty   (NonEmpty)
 import           Data.Word            (Word32)
-import           Prelude              (String)
 import           Protolude            hiding (get, put)
 
 data PublicKeyType
@@ -23,11 +26,7 @@ instance Binary PublicKeyType where
 newtype PublicKey
   = PublicKeyEd25519
   { unPublicKeyEd25519 :: Word256
-  } deriving (Eq, Show)
-
-instance Binary PublicKey where
-  get = (get :: Get PublicKeyType) >> fmap PublicKeyEd25519 get
-  put k = put PublicKeyTypeEd25519 >> put (unPublicKeyEd25519 k)
+  } deriving (Eq, Show, Binary)
 
 
 data SignerKeyType
@@ -75,16 +74,6 @@ newtype AssetCode12
   } deriving (Eq, Show, Binary)
 
 
-newtype DataValue
-  = DataValue
-  { unDataValue :: ByteString
-  } deriving (Eq, Show)
-
-instance Binary DataValue where
-  get = DataValue <$> fmap unPadded get
-  put = put . Padded . unDataValue
-
-
 data AssetType
   = AssetTypeNative
   | AssetTypeCreditAlphanum4
@@ -95,6 +84,12 @@ instance Binary AssetType where
   get = getEnum
   put = putEnum
 
+assetType :: Asset -> AssetType
+assetType = \case
+  AssetNative -> AssetTypeNative
+  AssetCreditAlphanum4 _ _ -> AssetTypeCreditAlphanum4
+  AssetCreditAlphanum12 _ _ -> AssetTypeCreditAlphanum12
+
 data Asset
   = AssetNative
   | AssetCreditAlphanum4 AssetCode4 PublicKey
@@ -102,29 +97,22 @@ data Asset
   deriving (Eq, Show)
 
 instance Binary Asset where
-  get = do
-    kt :: AssetType <- get
-    case kt of
-      AssetTypeNative           -> pure AssetNative
-      AssetTypeCreditAlphanum4  -> AssetCreditAlphanum4 <$> get <*> get
-      AssetTypeCreditAlphanum12 -> AssetCreditAlphanum12 <$> get <*> get
-  put AssetNative =
-    put AssetTypeNative
-  put (AssetCreditAlphanum4 code pk) =
-    put AssetTypeCreditAlphanum4 >> put code >> put pk
-  put (AssetCreditAlphanum12 code pk) =
-    put AssetTypeCreditAlphanum12 >> put code >> put pk
+  get = get >>= \case
+    AssetTypeNative           -> pure AssetNative
+    AssetTypeCreditAlphanum4  -> AssetCreditAlphanum4 <$> get <*> get
+    AssetTypeCreditAlphanum12 -> AssetCreditAlphanum12 <$> get <*> get
+  put AssetNative = put AssetTypeNative
+  put (AssetCreditAlphanum4 code pk) =  put AssetTypeCreditAlphanum4  >> put code >> put pk
+  put (AssetCreditAlphanum12 code pk) = put AssetTypeCreditAlphanum12 >> put code >> put pk
 
 
 data Price
   = Price
   { numerator   :: Int32
   , denominator :: Int32
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic)
 
-instance Binary Price where
-  get = Price <$> get <*> get
-  put (Price n d) = put n >> put d
+instance Binary Price
 
 
 newtype Fee
@@ -170,7 +158,7 @@ instance Binary MemoType where
 
 data Memo
   = MemoNone
-  | MemoText Text -- string text<28>;
+  | MemoText (Limited 28 ByteString)
   | MemoId Word64
   | MemoHash Hash -- the hash of what to pull from the content server
   | MemoReturn Hash -- the hash of the tx you are rejecting
@@ -178,7 +166,7 @@ data Memo
 
 instance Binary Memo where
   put MemoNone       = put MemoTypeNone
-  put (MemoText t)   = put MemoTypeText >> put (Padded t)
+  put (MemoText t)   = put MemoTypeText >> put t
   put (MemoId i)     = put MemoTypeId >> put i
   put (MemoHash h)   = put MemoTypeHash >> put h
   put (MemoReturn h) = put MemoTypeReturn >> put h
@@ -186,7 +174,7 @@ instance Binary Memo where
     t <- get
     case t of
       MemoTypeNone   -> pure MemoNone
-      MemoTypeText   -> MemoText . unPadded <$> get
+      MemoTypeText   -> MemoText <$> get
       MemoTypeId     -> MemoId <$> get
       MemoTypeHash   -> MemoHash <$> get
       MemoTypeReturn -> MemoReturn <$> get
@@ -246,7 +234,10 @@ data ManageOfferOp
   , amount  :: Int64
   , price   :: Price    -- price of thing being sold in terms of what you are buying
   , offerId :: OfferId
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic)
+
+instance Binary ManageOfferOp
+
 
 data CreatePassiveOfferOp
   = CreatePassiveOfferOp
@@ -254,7 +245,16 @@ data CreatePassiveOfferOp
   , buying  :: Asset
   , amount  :: Int64    -- amount taker gets. if set to 0, delete the offer
   , price   :: Price    -- price of thing being sold in terms of what you are buying
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic)
+
+instance Binary CreatePassiveOfferOp
+
+
+newtype HomeDomain
+  = HomeDomain
+  { unHomeDomain :: Limited 32 Text
+  } deriving (Eq, Show, Binary)
+
 
 data SetOptionsOp
   = SetOptionsOp
@@ -265,9 +265,32 @@ data SetOptionsOp
   , lowThreshold    :: Maybe Threshold
   , mediumThreshold :: Maybe Threshold
   , highThreshold   :: Maybe Threshold
-  , homeDomain      :: Maybe String
+  , homeDomain      :: Maybe HomeDomain
   , signer          :: Maybe Signer
   } deriving (Eq, Show)
+
+instance Binary SetOptionsOp where
+  put op = do
+    op & put . Padded . inflationDest
+    op & put . Padded . clearFlags
+    op & put . Padded . setFlags
+    op & put . Padded . masterWeight
+    op & put . Padded . lowThreshold
+    op & put . Padded . mediumThreshold
+    op & put . Padded . highThreshold
+    op & put . Padded . homeDomain
+    op & put . Padded . signer
+  get = SetOptionsOp
+    <$> fmap unPadded get
+    <*> fmap unPadded get
+    <*> fmap unPadded get
+    <*> fmap unPadded get
+    <*> fmap unPadded get
+    <*> fmap unPadded get
+    <*> fmap unPadded get
+    <*> fmap unPadded get
+    <*> fmap unPadded get
+
 
 data ChangeTrustOp
   = ChangeTrustOp
@@ -275,12 +298,76 @@ data ChangeTrustOp
   , limit :: Maybe Int64   -- limit, Nothing deletes the trust line
   } deriving (Eq, Show)
 
+instance Binary ChangeTrustOp where
+  put op = do
+    op & put . line
+    op & put . Padded . limit
+  get = ChangeTrustOp <$> get <*> fmap unPadded get
+
+
 data AllowTrustOp
   = AllowTrustOp
   { trustor   :: PublicKey
   , asset     :: Either AssetCode4 AssetCode12
   , authorize :: Bool
   } deriving (Eq, Show)
+
+instance Binary AllowTrustOp where
+  put op = do
+    op & put . trustor
+    either (put . (AssetTypeCreditAlphanum4,))
+           (put . (AssetTypeCreditAlphanum12,))
+           $ asset (op :: AllowTrustOp)
+    op & put . Padded . authorize
+  get = do
+    trustor <- get
+    asset <- get >>= \case
+      AssetTypeNative -> fail "Can't allow trust for a native asset"
+      AssetTypeCreditAlphanum4  -> fmap Left  (get :: Get AssetCode4)
+      AssetTypeCreditAlphanum12 -> fmap Right (get :: Get AssetCode12)
+    authorize <- fmap unPadded get
+    pure $ AllowTrustOp trustor asset authorize
+
+
+newtype DataValue
+  = DataValue (Limited 64 ByteString)
+  deriving (Eq, Show, Binary)
+
+unDataValue :: DataValue -> ByteString
+unDataValue (DataValue l) = unLimited l
+
+
+data ManageDataOp
+  = ManageDataOp
+  { dataName  :: Limited 64 Text
+  , dataValue :: Maybe DataValue
+  } deriving (Eq, Show)
+
+instance Binary ManageDataOp where
+  put op = do
+    op & put . dataName
+    op & put . Padded . dataValue
+  get = ManageDataOp <$> get <*> fmap unPadded get
+
+
+data OperationType
+  = OperationTypeCreateAccount
+  | OperationTypePayment
+  | OperationTypePathPayment
+  | OperationTypeManageOffer
+  | OperationTypeCreatePassiveOffer
+  | OperationTypeSetOptions
+  | OperationTypeChangeTrust
+  | OperationTypeAllowTrust
+  | OperationTypeAccountMerge
+  | OperationTypeInflation
+  | OperationTypeManageData
+  | OperationTypeBumpSequence
+  deriving (Eq, Show, Enum, Bounded)
+
+instance Binary OperationType where
+  get = getEnum
+  put = putEnum
 
 
 data Operation
@@ -294,44 +381,122 @@ data Operation
   | AllowTrust AllowTrustOp
   | AccountMerge PublicKey
   | Inflation
-  | ManageData String (Maybe DataValue)
+  | ManageData ManageDataOp
   | BumpSequence SequenceNumber
   deriving (Eq, Show)
 
+operationType :: Operation -> OperationType
+operationType op = case op of
+  CreateAccount _      -> OperationTypeCreateAccount
+  Payment _            -> OperationTypePayment
+  PathPayment _        -> OperationTypePathPayment
+  ManageOffer _        -> OperationTypeManageOffer
+  CreatePassiveOffer _ -> OperationTypeCreatePassiveOffer
+  SetOptions _         -> OperationTypeSetOptions
+  ChangeTrust _        -> OperationTypeChangeTrust
+  AllowTrust _         -> OperationTypeAllowTrust
+  AccountMerge _       -> OperationTypeAccountMerge
+  Inflation            -> OperationTypeInflation
+  ManageData _         -> OperationTypeManageData
+  BumpSequence _       -> OperationTypeBumpSequence
+
+
+instance Binary Operation where
+  put operation = do
+    operation & put . operationType
+    case operation of
+      CreateAccount op      -> put op
+      Payment op            -> put op
+      PathPayment op        -> put op
+      ManageOffer op        -> put op
+      CreatePassiveOffer op -> put op
+      SetOptions op         -> put op
+      ChangeTrust op        -> put op
+      AllowTrust op         -> put op
+      AccountMerge pk       -> put pk
+      Inflation             -> pure ()
+      ManageData op         -> put op
+      BumpSequence sn       -> put sn
+  get = get >>= \case
+    OperationTypeCreateAccount      -> CreateAccount      <$> get
+    OperationTypePayment            -> Payment            <$> get
+    OperationTypePathPayment        -> PathPayment        <$> get
+    OperationTypeManageOffer        -> ManageOffer        <$> get
+    OperationTypeCreatePassiveOffer -> CreatePassiveOffer <$> get
+    OperationTypeSetOptions         -> SetOptions         <$> get
+    OperationTypeChangeTrust        -> ChangeTrust        <$> get
+    OperationTypeAllowTrust         -> AllowTrust         <$> get
+    OperationTypeAccountMerge       -> AccountMerge       <$> get
+    OperationTypeManageData         -> ManageData         <$> get
+    OperationTypeBumpSequence       -> BumpSequence       <$> get
+    OperationTypeInflation          -> pure Inflation
+
+
 data AccountOperation
   = AccountOperation
-  { accountOperationSourceAccount :: Maybe PublicKey
-  , accountOperationOperation     :: Operation
+  { sourceAccount :: Maybe PublicKey
+  , operation     :: Operation
   } deriving (Eq, Show)
+
+instance Binary AccountOperation where
+  put op = do
+    put $ Padded $ sourceAccount (op :: AccountOperation)
+    put $ operation op
+  get = AccountOperation <$> fmap unPadded get <*> get
+
 
 data Transaction
   = Transaction
-  { transactionSourceAccount :: PublicKey
-  , transactionFee           :: Fee
-  , transactionSeqNum        :: SequenceNumber
-  , transactionTimeBounds    :: Maybe TimeBounds
-  , transactionMemo          :: Memo
-  , transactionOperations    :: NonEmpty AccountOperation -- max 100
+  { sourceAccount :: PublicKey
+  , fee           :: Fee
+  , seqNum        :: SequenceNumber
+  , timeBounds    :: Maybe TimeBounds
+  , memo          :: Memo
+  , operations    :: NonEmpty AccountOperation -- max 100
   } deriving (Eq, Show)
+
+instance Binary Transaction where
+  put tx = do
+    put $ sourceAccount (tx :: Transaction)
+    tx & put . fee
+    tx & put . seqNum
+    tx & put . Padded . timeBounds
+    tx & put . memo
+    tx & put . operations
+  get = Transaction
+    <$> get
+    <*> get
+    <*> get
+    <*> fmap unPadded get
+    <*> get
+    <*> get
+
 
 newtype SignatureHint
   = SignatureHint
   { unSignatureHint :: Word32
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Binary)
+
 
 newtype Signature
   = Signature
-  { unSignature :: ByteString
-  } deriving (Eq, Show)
+  { unSignature :: Limited 256 ByteString -- TODO exact size
+  } deriving (Eq, Show, Binary)
+
 
 data DecoratedSignature
   = DecoratedSignature
-  { decoratedSignatureHint      :: SignatureHint
-  , decoratedSignatureSignature :: Signature
-  } deriving (Eq, Show)
+  { signatureHint :: SignatureHint
+  , signature     :: Signature
+  } deriving (Eq, Show, Generic)
+
+instance Binary DecoratedSignature
+
 
 data TransactionEnvelope
   = TransactionEnvelope
-  { transactionEnvelopeTransaction :: Transaction
-  , transactionEnvelopeSignatures  :: [DecoratedSignature]
-  } deriving (Eq, Show)
+  { transaction :: Transaction
+  , signatures  :: [DecoratedSignature]
+  } deriving (Eq, Show, Generic)
+
+instance Binary TransactionEnvelope

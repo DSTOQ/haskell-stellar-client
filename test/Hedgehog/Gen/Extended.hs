@@ -6,14 +6,18 @@ module Hedgehog.Gen.Extended
   , expWord64
   , expInt32
   , expInt64
+  , either
   ) where
 
-import           Data.Int
+import           Protolude      hiding (either)
+
 import           Data.LargeWord (Word256, Word96)
-import           Data.Word
-import           Hedgehog       (Gen, Range)
+import           Hedgehog
 import           Hedgehog.Gen
 import qualified Hedgehog.Range as Range
+
+either :: MonadGen m => m a -> m b -> m (Either a b)
+either a b = choice [fmap Left a, fmap Right b]
 
 word96 :: Range Word96 -> Gen Word96
 word96 = integral
