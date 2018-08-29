@@ -80,8 +80,12 @@ gens =
 roundtrip :: Checkable
 roundtrip = Checkable $ \gen -> property $ do
   v <- forAll gen
-  case (decodeOrFail . encode) v of
-    Left _ -> failure
+  let encoded = encode v
+  annotateShow encoded
+  case decodeOrFail encoded of
+    Left (_, _, err) -> do
+      annotate err
+      failure
     Right (unconsumed, _, decoded) -> do
       decoded === v
       BL.length unconsumed === 0
@@ -143,7 +147,7 @@ genHash = Hash <$> Gen.word256 Range.exponentialBounded
 genMemo :: Gen Memo
 genMemo = Gen.choice
   [ pure MemoNone
-  , MemoText . Limited <$> Gen.bytes (Range.linear 0 27)
+  , MemoText . VarLen <$> Gen.bytes (Range.linear 0 27)
   , MemoId <$> Gen.expWord64
   , MemoHash <$> genHash
   , MemoReturn <$> genHash
@@ -193,7 +197,7 @@ genCreatePassiveOfferOp = CreatePassiveOfferOp
   <*> genPrice
 
 genHomeDomain :: Gen HomeDomain
-genHomeDomain = HomeDomain . Limited <$> Gen.text (Range.linear 1 10) Gen.ascii
+genHomeDomain = HomeDomain . VarLen <$> Gen.text (Range.linear 1 32) Gen.ascii
 
 genSetOptionsOp :: Gen SetOptionsOp
 genSetOptionsOp = SetOptionsOp
@@ -219,11 +223,11 @@ genAllowTrustOp = AllowTrustOp
   <*> Gen.bool
 
 genDataValue :: Gen DataValue
-genDataValue = DataValue . Limited <$> Gen.bytes (Range.linear 0 64)
+genDataValue = DataValue . VarLen <$> Gen.bytes (Range.linear 0 64)
 
 genManageDataOp :: Gen ManageDataOp
 genManageDataOp = ManageDataOp
-  <$> (Limited <$> Gen.text (Range.linear 1 10) Gen.ascii)
+  <$> (VarLen <$> Gen.text (Range.linear 1 10) Gen.ascii)
   <*> Gen.maybe genDataValue
 
 genOperationType :: Gen OperationType
@@ -276,7 +280,7 @@ genSignatureHint :: Gen SignatureHint
 genSignatureHint = SignatureHint <$> Gen.expWord32
 
 genSignature :: Gen Signature
-genSignature = Signature . Limited <$> Gen.bytes (Range.singleton 256)
+genSignature = Signature . FixLen <$> Gen.bytes (Range.singleton 256)
 
 genDecoratedSignature :: Gen DecoratedSignature
 genDecoratedSignature = DecoratedSignature

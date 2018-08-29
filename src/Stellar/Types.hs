@@ -4,15 +4,107 @@
 {-# LANGUAGE StrictData          #-}
 {-# LANGUAGE TupleSections       #-}
 
-module Stellar.Types where
+module Stellar.Types
+  ( VarLen
+  , unVarLen
+  , FixLen
+  , unFixLen
+  , PublicKeyType (..)
+  , PublicKey (..)
+  , SignerKeyType (..)
+  , signerKeyType
+  , SignerKey (..)
+  , Threshold (..)
+  , AssetCode4 (..)
+  , AssetCode12 (..)
+  , AssetType (..)
+  , assetType
+  , Asset (..)
+  , Price (..)
+  , Fee (..)
+  , SequenceNumber (..)
+  , Hash (..)
+  , MemoType (..)
+  , Memo (..)
+  , Signer (..)
+  , CreateAccountOp (..)
+  , PaymentOp (..)
+  , OfferId (..)
+  , ManageOfferOp (..)
+  , CreatePassiveOfferOp (..)
+  , HomeDomain (..)
+  , SetOptionsOp (..)
+  , ChangeTrustOp (..)
+  , AllowTrustOp (..)
+  , DataValue
+  , mkDataValue
+  , unDataValue
+  , ManageDataOp (..)
+  , OperationType (..)
+  , operationType
+  , Operation (..)
+  , AccountOperation (..)
+  , TimeBounds (..)
+  , Transaction (..)
+  , SignatureHint (..)
+  , Signature (..)
+  , DecoratedSignature (..)
+  , TransactionEnvelope (..)
+  ) where
 
 import           Control.Monad        (fail)
 import           Data.Binary.Extended
-import           Data.Binary.Get      (Get)
+import           Data.Binary.Get      (Get, getByteString, getWord32be, skip)
+import           Data.ByteString      as BS
 import           Data.LargeWord       (Word256, Word96)
 import           Data.List.NonEmpty   (NonEmpty)
 import           Data.Word            (Word32)
+import           GHC.TypeLits
 import           Protolude            hiding (get, put)
+
+newtype VarLen (n :: Nat) a
+  = VarLen
+  { unVarLen :: a
+  } deriving (Eq, Show)
+
+instance KnownNat n => Binary (VarLen n ByteString) where
+  put (VarLen bs) = putPaddedByteString bs
+  get = do
+    len <- getWord32be <&> fromIntegral
+    let cap = fromInteger $ natVal (Proxy :: Proxy n)
+    if len > cap
+      then fail $ "Max length (" <> show cap <> ") exceeded (" <> show len <> ")"
+      else do
+        bs <- getByteString len
+        skip $ padding 4 len
+        pure $ VarLen bs
+
+instance KnownNat n => Binary (FixLen n ByteString) where
+  put (FixLen bs) =
+    let len = fromInteger $ natVal (Proxy :: Proxy n)
+    in putPaddedByteString $ BS.take len bs
+  get = do
+    let cap = fromInteger $ natVal (Proxy :: Proxy n)
+    len <- getWord32be <&> fromIntegral
+    if len /= cap
+      then fail $ "Invalid byte length: expected "
+                <> show cap <> ", got " <> show len
+      else do
+        bs <- getByteString len
+        skip $ padding 4 len
+        pure $ FixLen bs
+
+
+newtype FixLen (n :: Nat) a
+  = FixLen
+  { unFixLen :: a
+  } deriving (Eq, Show)
+
+
+instance KnownNat n => Binary (VarLen n Text) where
+  put (VarLen t) = put (VarLen (toS t) :: VarLen n ByteString)
+  get = get <&> \(VarLen bs :: VarLen n ByteString) -> VarLen (toS bs)
+
 
 data PublicKeyType
   = PublicKeyTypeEd25519
@@ -39,6 +131,12 @@ instance Binary SignerKeyType where
   get = getEnum
   put = putEnum
 
+signerKeyType :: SignerKey -> SignerKeyType
+signerKeyType = \case
+  SignerKeyEd25519 _   -> SignerKeyTypeEd25519
+  SignerKeyPreAuthTx _ -> SignerKeyTypePreAuthTx
+  SignerKeyHashX _     -> SignerKeyTypeHashX
+
 
 data SignerKey
   = SignerKeyEd25519 Word256
@@ -48,7 +146,7 @@ data SignerKey
 
 instance Binary SignerKey where
   get = do
-    kt :: SignerKeyType <- get
+    kt <- get
     get <&> case kt of
       SignerKeyTypeEd25519   -> SignerKeyEd25519
       SignerKeyTypePreAuthTx -> SignerKeyPreAuthTx
@@ -63,10 +161,12 @@ newtype Threshold
   { unThreshold :: Word32
   } deriving (Eq, Show, Binary)
 
+
 newtype AssetCode4
   = AssetCode4
   { unAssetCode4 :: Word32
   } deriving (Eq, Show, Binary)
+
 
 newtype AssetCode12
   = AssetCode12
@@ -87,8 +187,9 @@ instance Binary AssetType where
 assetType :: Asset -> AssetType
 assetType = \case
   AssetNative -> AssetTypeNative
-  AssetCreditAlphanum4 _ _ -> AssetTypeCreditAlphanum4
+  AssetCreditAlphanum4 _ _  -> AssetTypeCreditAlphanum4
   AssetCreditAlphanum12 _ _ -> AssetTypeCreditAlphanum12
+
 
 data Asset
   = AssetNative
@@ -102,8 +203,10 @@ instance Binary Asset where
     AssetTypeCreditAlphanum4  -> AssetCreditAlphanum4 <$> get <*> get
     AssetTypeCreditAlphanum12 -> AssetCreditAlphanum12 <$> get <*> get
   put AssetNative = put AssetTypeNative
-  put (AssetCreditAlphanum4 code pk) =  put AssetTypeCreditAlphanum4  >> put code >> put pk
-  put (AssetCreditAlphanum12 code pk) = put AssetTypeCreditAlphanum12 >> put code >> put pk
+  put (AssetCreditAlphanum4 code pk) =
+    put AssetTypeCreditAlphanum4  >> put code >> put pk
+  put (AssetCreditAlphanum12 code pk) =
+    put AssetTypeCreditAlphanum12 >> put code >> put pk
 
 
 data Price
@@ -127,16 +230,6 @@ newtype SequenceNumber
   } deriving (Eq, Show, Binary)
 
 
-data TimeBounds
-  = TimeBounds
-  { timeBoundsMinTime :: Word64
-  , timeBoundsMaxTime :: Maybe Word64 -- 0 here means no maxTime
-  } deriving (Eq, Show)
-
-instance Binary TimeBounds where
-  get = TimeBounds <$> get <*> fmap unPadded get
-  put (TimeBounds mn mx) = put mn >> put (Padded mx)
-
 newtype Hash
   = Hash
   { unHash :: Word256
@@ -158,7 +251,7 @@ instance Binary MemoType where
 
 data Memo
   = MemoNone
-  | MemoText (Limited 28 ByteString)
+  | MemoText (VarLen 28 ByteString)
   | MemoId Word64
   | MemoHash Hash -- the hash of what to pull from the content server
   | MemoReturn Hash -- the hash of the tx you are rejecting
@@ -252,7 +345,7 @@ instance Binary CreatePassiveOfferOp
 
 newtype HomeDomain
   = HomeDomain
-  { unHomeDomain :: Limited 32 Text
+  { unHomeDomain :: VarLen 32 Text
   } deriving (Eq, Show, Binary)
 
 
@@ -330,16 +423,20 @@ instance Binary AllowTrustOp where
 
 
 newtype DataValue
-  = DataValue (Limited 64 ByteString)
+  = DataValue (VarLen 64 ByteString)
   deriving (Eq, Show, Binary)
 
+mkDataValue :: ByteString -> Maybe DataValue
+mkDataValue bs | BS.length bs <= 64 = Just $ DataValue $ VarLen bs
+mkDataValue _  = Nothing
+
 unDataValue :: DataValue -> ByteString
-unDataValue (DataValue l) = unLimited l
+unDataValue (DataValue l) = unVarLen l
 
 
 data ManageDataOp
   = ManageDataOp
-  { dataName  :: Limited 64 Text
+  { dataName  :: VarLen 64 Text
   , dataValue :: Maybe DataValue
   } deriving (Eq, Show)
 
@@ -369,22 +466,6 @@ instance Binary OperationType where
   get = getEnum
   put = putEnum
 
-
-data Operation
-  = CreateAccount CreateAccountOp
-  | Payment PaymentOp
-  | PathPayment PathPaymentOp
-  | ManageOffer ManageOfferOp
-  | CreatePassiveOffer CreatePassiveOfferOp
-  | SetOptions SetOptionsOp
-  | ChangeTrust ChangeTrustOp
-  | AllowTrust AllowTrustOp
-  | AccountMerge PublicKey
-  | Inflation
-  | ManageData ManageDataOp
-  | BumpSequence SequenceNumber
-  deriving (Eq, Show)
-
 operationType :: Operation -> OperationType
 operationType op = case op of
   CreateAccount _      -> OperationTypeCreateAccount
@@ -400,6 +481,20 @@ operationType op = case op of
   ManageData _         -> OperationTypeManageData
   BumpSequence _       -> OperationTypeBumpSequence
 
+data Operation
+  = CreateAccount CreateAccountOp
+  | Payment PaymentOp
+  | PathPayment PathPaymentOp
+  | ManageOffer ManageOfferOp
+  | CreatePassiveOffer CreatePassiveOfferOp
+  | SetOptions SetOptionsOp
+  | ChangeTrust ChangeTrustOp
+  | AllowTrust AllowTrustOp
+  | AccountMerge PublicKey
+  | Inflation
+  | ManageData ManageDataOp
+  | BumpSequence SequenceNumber
+  deriving (Eq, Show)
 
 instance Binary Operation where
   put operation = do
@@ -445,6 +540,17 @@ instance Binary AccountOperation where
   get = AccountOperation <$> fmap unPadded get <*> get
 
 
+data TimeBounds
+  = TimeBounds
+  { timeBoundsMinTime :: Word64
+  , timeBoundsMaxTime :: Maybe Word64 -- 0 here means no maxTime
+  } deriving (Eq, Show)
+
+instance Binary TimeBounds where
+  get = TimeBounds <$> get <*> fmap unPadded get
+  put (TimeBounds mn mx) = put mn >> put (Padded mx)
+
+
 data Transaction
   = Transaction
   { sourceAccount :: PublicKey
@@ -464,12 +570,12 @@ instance Binary Transaction where
     tx & put . memo
     tx & put . operations
   get = Transaction
-    <$> get
-    <*> get
-    <*> get
-    <*> fmap unPadded get
-    <*> get
-    <*> get
+    <$> get               -- sourceAccount
+    <*> get               -- fee
+    <*> get               -- seqNum
+    <*> fmap unPadded get -- timeBounds
+    <*> get               -- memo
+    <*> get               -- operations
 
 
 newtype SignatureHint
@@ -480,7 +586,7 @@ newtype SignatureHint
 
 newtype Signature
   = Signature
-  { unSignature :: Limited 256 ByteString -- TODO exact size
+  { unSignature :: FixLen 256 ByteString
   } deriving (Eq, Show, Binary)
 
 
