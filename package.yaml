@@ -1,10 +1,10 @@
-name: stellar-core
+name: stellar-client
 version: 0.1.0.0
 author: DSQ AG
 maintainer: engineering@dstoq.exchange
 copyright: DSQ AG
 license: BSD3 # TODO: what is the proper license?
-github: dstoq/haskell-stellar-core
+github: dstoq/haskell-stellar-client
 extra-source-files:
 - README.md
 
@@ -60,18 +60,32 @@ default-extensions:
 - TypeFamilyDependencies
 - TypeOperators
 
+executables:
+  stellar-client:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - base >= 4.9 && < 5
+    - stellar-client
+    - protolude
+
 library:
   source-dirs: src
   dependencies:
   - base >= 4.9 && < 5
-  - protolude
-  - bytestring
   - binary
-  - largeword
-  - semigroups
+  - bytestring
+  - base64-bytestring
+  - extra
+  - protolude
+  - stellar-core
   exposed-modules:
-  - Stellar.Types
-  - Data.Binary.Extended
+  - Stellar.Parser
+  - Stellar.Printer
 
 tests:
   spec:
@@ -82,7 +96,10 @@ tests:
     - base >= 4.9 && < 5
     - binary
     - bytestring
-    - largeword
+    - filepath
     - protolude
     - stellar-core
-    - hedgehog
+    - stellar-client
+    - tasty
+    - tasty-golden
+    - tasty-hunit
