@@ -1,2 +1,2 @@
-# haskell-stellar-core
-Core Stellar types for Haskell
+# haskell-stellar-client
+Stellar Client for Haskell
