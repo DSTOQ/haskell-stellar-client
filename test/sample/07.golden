@@ -1,1 +1,50 @@
-TransactionEnvelope {transaction = Transaction {sourceAccount = PublicKeyEd25519 {unPublicKeyEd25519 = 96208501124494311859351736218932660155904181775516288493633903600368474626313}, fee = Fee {unFee = 100}, seqNum = SequenceNumber {unSequenceNumber = 46373869996474369}, timeBounds = Nothing, memo = MemoNone, operations = VarLen {unVarLen = [Operation {sourceAccount = Nothing, body = ChangeTrust (ChangeTrustOp {line = AssetCreditAlphanum4 (AssetCode4 {unAssetCode4 = 1213483854}) (PublicKeyEd25519 {unPublicKeyEd25519 = 48719781938602096453436114010251764830087310142640098156249894279754447416792}), limit = Just 9223372036854775807})}]}}, signatures = VarLen {unVarLen = [DecoratedSignature {hint = SignatureHint {unSignatureHint = 2252052745}, signature = Signature {unSignature = VarLen {unVarLen = "\219\161\175\135o\199\148}\189.\188\EOT\152(\179<\200GC\139-\ESC\253\&9\208\178\a\247\128\243\&8{\139\NUL\188S\156\171\RS\242%\NAK\178J\253\216\189\169\217+^\237\164'\219x\163|n#t\v\141\b"}}}]}}
+TransactionEnvelope
+  { transaction =
+      Transaction
+        { sourceAccount =
+            PublicKeyEd25519
+              { unPublicKeyEd25519 =
+                  96208501124494311859351736218932660155904181775516288493633903600368474626313
+              }
+        , fee = Fee { unFee = 100 }
+        , seqNum = SequenceNumber { unSequenceNumber = 46373869996474369 }
+        , timeBounds = Nothing
+        , memo = MemoNone
+        , operations =
+            VarLen
+              { unVarLen =
+                  [ Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          ChangeTrust
+                            ChangeTrustOp
+                              { line =
+                                  AssetCreditAlphanum4
+                                    AssetCode4 { unAssetCode4 = 1213483854 }
+                                    PublicKeyEd25519
+                                      { unPublicKeyEd25519 =
+                                          48719781938602096453436114010251764830087310142640098156249894279754447416792
+                                      }
+                              , limit = Just 9223372036854775807
+                              }
+                      }
+                  ]
+              }
+        }
+  , signatures =
+      VarLen
+        { unVarLen =
+            [ DecoratedSignature
+                { hint = SignatureHint { unSignatureHint = 2252052745 }
+                , signature =
+                    Signature
+                      { unSignature =
+                          VarLen
+                            { unVarLen =
+                                "\219\161\175\135o\199\148}\189.\188\EOT\152(\179<\200GC\139-\ESC\253\&9\208\178\a\247\128\243\&8{\139\NUL\188S\156\171\RS\242%\NAK\178J\253\216\189\169\217+^\237\164'\219x\163|n#t\v\141\b"
+                            }
+                      }
+                }
+            ]
+        }
+  }

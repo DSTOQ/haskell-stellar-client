@@ -1,1 +1,54 @@
-TransactionEnvelope {transaction = Transaction {sourceAccount = PublicKeyEd25519 {unPublicKeyEd25519 = 64515967999955780713154879327851495591106351114761682443903344459951597142437}, fee = Fee {unFee = 100}, seqNum = SequenceNumber {unSequenceNumber = 43876020096336346}, timeBounds = Nothing, memo = MemoHash (Hash {unHash = 2562569224040160631393536300526679981894103779213696212162733799721821098269}), operations = VarLen {unVarLen = [Operation {sourceAccount = Nothing, body = Payment (PaymentOp {destination = PublicKeyEd25519 {unPublicKeyEd25519 = 23599169990946464707245581489179011315953449909347828706960182488016750576992}, asset = AssetNative, amount = 20000000})}]}}, signatures = VarLen {unVarLen = [DecoratedSignature {hint = SignatureHint {unSignatureHint = 15188389}, signature = Signature {unSignature = VarLen {unVarLen = "w4y\143$g%\203\194~\204\160w_b\FS\205/\177\213B\STX\241\161d\n)\220\198\r}\247_\ESCP.2)kC\241\ETB'c\209ZP\230\&5\244\161\138f6\ETB%\252\172?\239H\GS\142\NUL"}}}]}}
+TransactionEnvelope
+  { transaction =
+      Transaction
+        { sourceAccount =
+            PublicKeyEd25519
+              { unPublicKeyEd25519 =
+                  64515967999955780713154879327851495591106351114761682443903344459951597142437
+              }
+        , fee = Fee { unFee = 100 }
+        , seqNum = SequenceNumber { unSequenceNumber = 43876020096336346 }
+        , timeBounds = Nothing
+        , memo =
+            MemoHash
+              Hash
+                { unHash =
+                    2562569224040160631393536300526679981894103779213696212162733799721821098269
+                }
+        , operations =
+            VarLen
+              { unVarLen =
+                  [ Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          Payment
+                            PaymentOp
+                              { destination =
+                                  PublicKeyEd25519
+                                    { unPublicKeyEd25519 =
+                                        23599169990946464707245581489179011315953449909347828706960182488016750576992
+                                    }
+                              , asset = AssetNative
+                              , amount = 20000000
+                              }
+                      }
+                  ]
+              }
+        }
+  , signatures =
+      VarLen
+        { unVarLen =
+            [ DecoratedSignature
+                { hint = SignatureHint { unSignatureHint = 15188389 }
+                , signature =
+                    Signature
+                      { unSignature =
+                          VarLen
+                            { unVarLen =
+                                "w4y\143$g%\203\194~\204\160w_b\FS\205/\177\213B\STX\241\161d\n)\220\198\r}\247_\ESCP.2)kC\241\ETB'c\209ZP\230\&5\244\161\138f6\ETB%\252\172?\239H\GS\142\NUL"
+                            }
+                      }
+                }
+            ]
+        }
+  }

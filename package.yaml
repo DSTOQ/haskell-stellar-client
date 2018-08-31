@@ -98,6 +98,7 @@ tests:
     - bytestring
     - filepath
     - protolude
+    - pretty-show
     - stellar-core
     - stellar-client
     - tasty

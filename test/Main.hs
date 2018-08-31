@@ -10,7 +10,7 @@ import           Stellar.Parser
 import           System.FilePath            (replaceExtension, takeBaseName)
 import           Test.Tasty                 (TestTree, defaultMain, testGroup)
 import           Test.Tasty.Golden          (findByExtension, goldenVsString)
-
+import           Text.Show.Pretty           (ppShow)
 
 main :: IO ()
 main = goldenTests >>= defaultMain
@@ -35,4 +35,4 @@ action = LBS.readFile >=> parse >=> printB64
   parse = either error pure . parseBinaryB64 . dropSpaceEnd
 
   printB64 :: TransactionEnvelope -> IO LByteString
-  printB64 = pure . show
+  printB64 = pure . toS . ppShow

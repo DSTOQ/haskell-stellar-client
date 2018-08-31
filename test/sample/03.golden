@@ -1,1 +1,55 @@
-TransactionEnvelope {transaction = Transaction {sourceAccount = PublicKeyEd25519 {unPublicKeyEd25519 = 34969225231759973836359833576240397618815352045076874891248687966810494758086}, fee = Fee {unFee = 100}, seqNum = SequenceNumber {unSequenceNumber = 40695085712540286}, timeBounds = Nothing, memo = MemoNone, operations = VarLen {unVarLen = [Operation {sourceAccount = Nothing, body = Payment (PaymentOp {destination = PublicKeyEd25519 {unPublicKeyEd25519 = 97678337911768558865512749678068891183310559961497594465697983260983599974155}, asset = AssetCreditAlphanum4 (AssetCode4 {unAssetCode4 = 1213483854}) (PublicKeyEd25519 {unPublicKeyEd25519 = 48719781938602096453436114010251764830087310142640098156249894279754447416792}), amount = 50000000})}]}}, signatures = VarLen {unVarLen = [DecoratedSignature {hint = SignatureHint {unSignatureHint = 378301638}, signature = Signature {unSignature = VarLen {unVarLen = "\242\178=k\EMr$\SOY\STXX\233\208RCF3\221\223\168\139\248_\223\v\SO\237\237\&2wk\212\DC4\v{\EM\243\&6\232\ETB\160\139\175F\RS\ETX\143\230I\207\176\GS[e\204\131\130\147\STX\ESC\252\DEL\240\SI"}}}]}}
+TransactionEnvelope
+  { transaction =
+      Transaction
+        { sourceAccount =
+            PublicKeyEd25519
+              { unPublicKeyEd25519 =
+                  34969225231759973836359833576240397618815352045076874891248687966810494758086
+              }
+        , fee = Fee { unFee = 100 }
+        , seqNum = SequenceNumber { unSequenceNumber = 40695085712540286 }
+        , timeBounds = Nothing
+        , memo = MemoNone
+        , operations =
+            VarLen
+              { unVarLen =
+                  [ Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          Payment
+                            PaymentOp
+                              { destination =
+                                  PublicKeyEd25519
+                                    { unPublicKeyEd25519 =
+                                        97678337911768558865512749678068891183310559961497594465697983260983599974155
+                                    }
+                              , asset =
+                                  AssetCreditAlphanum4
+                                    AssetCode4 { unAssetCode4 = 1213483854 }
+                                    PublicKeyEd25519
+                                      { unPublicKeyEd25519 =
+                                          48719781938602096453436114010251764830087310142640098156249894279754447416792
+                                      }
+                              , amount = 50000000
+                              }
+                      }
+                  ]
+              }
+        }
+  , signatures =
+      VarLen
+        { unVarLen =
+            [ DecoratedSignature
+                { hint = SignatureHint { unSignatureHint = 378301638 }
+                , signature =
+                    Signature
+                      { unSignature =
+                          VarLen
+                            { unVarLen =
+                                "\242\178=k\EMr$\SOY\STXX\233\208RCF3\221\223\168\139\248_\223\v\SO\237\237\&2wk\212\DC4\v{\EM\243\&6\232\ETB\160\139\175F\RS\ETX\143\230I\207\176\GS[e\204\131\130\147\STX\ESC\252\DEL\240\SI"
+                            }
+                      }
+                }
+            ]
+        }
+  }

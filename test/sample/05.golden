@@ -1,1 +1,125 @@
-TransactionEnvelope {transaction = Transaction {sourceAccount = PublicKeyEd25519 {unPublicKeyEd25519 = 73796464499382006151152614252603807196781827224650109053774855681839325681133}, fee = Fee {unFee = 500}, seqNum = SequenceNumber {unSequenceNumber = 46283168877117507}, timeBounds = Nothing, memo = MemoNone, operations = VarLen {unVarLen = [Operation {sourceAccount = Nothing, body = ManageOffer (ManageOfferOp {selling = AssetCreditAlphanum4 (AssetCode4 {unAssetCode4 = 1129208064}) (PublicKeyEd25519 {unPublicKeyEd25519 = 12020110078372443445778830331393468099140010802731689699023048901958341411043}), buying = AssetNative, amount = 80000000, price = Price {numerator = 2271, denominator = 10000}, offerId = OfferId {unOfferId = 0}})},Operation {sourceAccount = Nothing, body = ManageOffer (ManageOfferOp {selling = AssetNative, buying = AssetCreditAlphanum4 (AssetCode4 {unAssetCode4 = 1431520256}) (PublicKeyEd25519 {unPublicKeyEd25519 = 12020110078372443445778830331393468099140010802731689699023048901958341411043}), amount = 60000000, price = Price {numerator = 2099, denominator = 10000}, offerId = OfferId {unOfferId = 0}})},Operation {sourceAccount = Nothing, body = ManageOffer (ManageOfferOp {selling = AssetCreditAlphanum4 (AssetCode4 {unAssetCode4 = 1481789440}) (PublicKeyEd25519 {unPublicKeyEd25519 = 12020110078372443445778830331393468099140010802731689699023048901958341411043}), buying = AssetNative, amount = 60000000, price = Price {numerator = 1307, denominator = 5000}, offerId = OfferId {unOfferId = 0}})},Operation {sourceAccount = Nothing, body = ManageOffer (ManageOfferOp {selling = AssetNative, buying = AssetCreditAlphanum4 (AssetCode4 {unAssetCode4 = 1482245888}) (PublicKeyEd25519 {unPublicKeyEd25519 = 12020110078372443445778830331393468099140010802731689699023048901958341411043}), amount = 10000000, price = Price {numerator = 73, denominator = 250}, offerId = OfferId {unOfferId = 0}})},Operation {sourceAccount = Nothing, body = ManageOffer (ManageOfferOp {selling = AssetNative, buying = AssetCreditAlphanum4 (AssetCode4 {unAssetCode4 = 1481395456}) (PublicKeyEd25519 {unPublicKeyEd25519 = 12020110078372443445778830331393468099140010802731689699023048901958341411043}), amount = 80000000, price = Price {numerator = 303, denominator = 1000}, offerId = OfferId {unOfferId = 0}})}]}}, signatures = VarLen {unVarLen = [DecoratedSignature {hint = SignatureHint {unSignatureHint = 909809133}, signature = Signature {unSignature = VarLen {unVarLen = "u\169a\134|\183t\RS)\237$\r\232\187\144\239I)\209^\181\v\246u\DLE\243\240\144n\179\145\132\173\142A+\176'*\180\248\177\158\160w6p\132r\146\146\222\205%\246{\fpg\215\SOH\202X\v"}}}]}}
+TransactionEnvelope
+  { transaction =
+      Transaction
+        { sourceAccount =
+            PublicKeyEd25519
+              { unPublicKeyEd25519 =
+                  73796464499382006151152614252603807196781827224650109053774855681839325681133
+              }
+        , fee = Fee { unFee = 500 }
+        , seqNum = SequenceNumber { unSequenceNumber = 46283168877117507 }
+        , timeBounds = Nothing
+        , memo = MemoNone
+        , operations =
+            VarLen
+              { unVarLen =
+                  [ Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          ManageOffer
+                            ManageOfferOp
+                              { selling =
+                                  AssetCreditAlphanum4
+                                    AssetCode4 { unAssetCode4 = 1129208064 }
+                                    PublicKeyEd25519
+                                      { unPublicKeyEd25519 =
+                                          12020110078372443445778830331393468099140010802731689699023048901958341411043
+                                      }
+                              , buying = AssetNative
+                              , amount = 80000000
+                              , price = Price { numerator = 2271 , denominator = 10000 }
+                              , offerId = OfferId { unOfferId = 0 }
+                              }
+                      }
+                  , Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          ManageOffer
+                            ManageOfferOp
+                              { selling = AssetNative
+                              , buying =
+                                  AssetCreditAlphanum4
+                                    AssetCode4 { unAssetCode4 = 1431520256 }
+                                    PublicKeyEd25519
+                                      { unPublicKeyEd25519 =
+                                          12020110078372443445778830331393468099140010802731689699023048901958341411043
+                                      }
+                              , amount = 60000000
+                              , price = Price { numerator = 2099 , denominator = 10000 }
+                              , offerId = OfferId { unOfferId = 0 }
+                              }
+                      }
+                  , Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          ManageOffer
+                            ManageOfferOp
+                              { selling =
+                                  AssetCreditAlphanum4
+                                    AssetCode4 { unAssetCode4 = 1481789440 }
+                                    PublicKeyEd25519
+                                      { unPublicKeyEd25519 =
+                                          12020110078372443445778830331393468099140010802731689699023048901958341411043
+                                      }
+                              , buying = AssetNative
+                              , amount = 60000000
+                              , price = Price { numerator = 1307 , denominator = 5000 }
+                              , offerId = OfferId { unOfferId = 0 }
+                              }
+                      }
+                  , Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          ManageOffer
+                            ManageOfferOp
+                              { selling = AssetNative
+                              , buying =
+                                  AssetCreditAlphanum4
+                                    AssetCode4 { unAssetCode4 = 1482245888 }
+                                    PublicKeyEd25519
+                                      { unPublicKeyEd25519 =
+                                          12020110078372443445778830331393468099140010802731689699023048901958341411043
+                                      }
+                              , amount = 10000000
+                              , price = Price { numerator = 73 , denominator = 250 }
+                              , offerId = OfferId { unOfferId = 0 }
+                              }
+                      }
+                  , Operation
+                      { sourceAccount = Nothing
+                      , body =
+                          ManageOffer
+                            ManageOfferOp
+                              { selling = AssetNative
+                              , buying =
+                                  AssetCreditAlphanum4
+                                    AssetCode4 { unAssetCode4 = 1481395456 }
+                                    PublicKeyEd25519
+                                      { unPublicKeyEd25519 =
+                                          12020110078372443445778830331393468099140010802731689699023048901958341411043
+                                      }
+                              , amount = 80000000
+                              , price = Price { numerator = 303 , denominator = 1000 }
+                              , offerId = OfferId { unOfferId = 0 }
+                              }
+                      }
+                  ]
+              }
+        }
+  , signatures =
+      VarLen
+        { unVarLen =
+            [ DecoratedSignature
+                { hint = SignatureHint { unSignatureHint = 909809133 }
+                , signature =
+                    Signature
+                      { unSignature =
+                          VarLen
+                            { unVarLen =
+                                "u\169a\134|\183t\RS)\237$\r\232\187\144\239I)\209^\181\v\246u\DLE\243\240\144n\179\145\132\173\142A+\176'*\180\248\177\158\160w6p\132r\146\146\222\205%\246{\fpg\215\SOH\202X\v"
+                            }
+                      }
+                }
+            ]
+        }
+  }
