@@ -9,7 +9,7 @@ import           Stellar
 import           Stellar.Parser
 import           System.FilePath            (replaceExtension, takeBaseName)
 import           Test.Tasty                 (TestTree, defaultMain, testGroup)
-import           Test.Tasty.Golden          (findByExtension, goldenVsString)
+import           Test.Tasty.Golden          (findByExtension, goldenVsFile)
 import           Text.Show.Pretty           (ppShow)
 
 main :: IO ()
@@ -19,13 +19,22 @@ goldenTests :: IO TestTree
 goldenTests = do
   b64files <- findByExtension [".txt"] "test/sample"
   pure $ testGroup "Base64 XDR unmarshalling tests"
-    [ goldenVsString (takeBaseName b64file) goldenFile (action b64file)
+    [ goldenVsFile
+      (takeBaseName b64file)
+      goldenFile
+      outputFile
+      (action b64file outputFile)
     | b64file <- b64files
     , let goldenFile = replaceExtension b64file ".golden"
+          outputFile = replaceExtension b64file ".output"
     ]
 
-action :: FilePath -> IO LByteString
-action = LBS.readFile >=> parse >=> printB64
+action :: FilePath -> FilePath -> IO ()
+action inputFile outputFile = do
+   input <- LBS.readFile inputFile
+   printed <- parse input
+   LBS.writeFile outputFile $ toS $ ppShow printed
+
   where
 
   dropSpaceEnd :: LByteString -> LByteString
@@ -33,6 +42,3 @@ action = LBS.readFile >=> parse >=> printB64
 
   parse :: LByteString -> IO TransactionEnvelope
   parse = either error pure . parseBinaryB64 . dropSpaceEnd
-
-  printB64 :: TransactionEnvelope -> IO LByteString
-  printB64 = pure . toS . ppShow

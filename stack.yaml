@@ -37,7 +37,7 @@ packages:
 # - ../haskell-stellar-core
 - location:
     git: https://github.com/dstoq/haskell-stellar-core
-    commit: 9fe09db23afac90f528f9063fc2b6ae09df697bc
+    commit: 0e69b015318e251a4ed986d5e3476b2694681008
   extra-dep: true
 - .
 
@@ -45,7 +45,8 @@ packages:
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
 extra-deps:
-# - stellar-core-0.1.0.0
+- base32-bytestring-0.2.1.0
+- bits-extras-0.1.3
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
