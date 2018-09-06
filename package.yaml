@@ -75,6 +75,7 @@ executables:
     - protolude
     - haskeline
     - lens
+    - monad-loops
 
 library:
   source-dirs: src
