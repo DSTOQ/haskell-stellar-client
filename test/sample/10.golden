@@ -70,8 +70,10 @@ TransactionEnvelope
                   , 100
                   ]
               }
-        , _fee = Fee { _fee = 500 }
-        , _seqNum = SequenceNumber { _sequenceNumber = 46283168877117510 }
+        , _fee = FeeStroops { _feeStroops = 500 }
+        , _seqNum =
+            SequenceNumber
+              { _sequenceNumber = NonNegativeInt64 (Refined 46283168877117510) }
         , _timeBounds = Nothing
         , _memo = MemoNone
         , _operations =
@@ -152,7 +154,7 @@ TransactionEnvelope
                                     ]
                                 }
                         , _buying = AssetNative
-                        , _amount = 90000000
+                        , _amount = NonNegativeInt64 (Refined 90000000)
                         , _price = Price { _numerator = 921 , _denominator = 2000 }
                         , _offerId = OfferId { _offerId = 0 }
                         }
@@ -234,7 +236,7 @@ TransactionEnvelope
                                     ]
                                 }
                         , _buying = AssetNative
-                        , _amount = 90000000
+                        , _amount = NonNegativeInt64 (Refined 90000000)
                         , _price = Price { _numerator = 1747 , _denominator = 10000 }
                         , _offerId = OfferId { _offerId = 0 }
                         }
@@ -316,7 +318,7 @@ TransactionEnvelope
                                     , 51
                                     ]
                                 }
-                        , _amount = 70000000
+                        , _amount = NonNegativeInt64 (Refined 70000000)
                         , _price = Price { _numerator = 4333 , _denominator = 5000 }
                         , _offerId = OfferId { _offerId = 0 }
                         }
@@ -398,7 +400,7 @@ TransactionEnvelope
                                     , 51
                                     ]
                                 }
-                        , _amount = 50000000
+                        , _amount = NonNegativeInt64 (Refined 50000000)
                         , _price = Price { _numerator = 6917 , _denominator = 10000 }
                         , _offerId = OfferId { _offerId = 0 }
                         }
@@ -480,7 +482,7 @@ TransactionEnvelope
                                     , 51
                                     ]
                                 }
-                        , _amount = 10000000
+                        , _amount = NonNegativeInt64 (Refined 10000000)
                         , _price = Price { _numerator = 5897 , _denominator = 10000 }
                         , _offerId = OfferId { _offerId = 0 }
                         }

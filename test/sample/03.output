@@ -70,8 +70,10 @@ TransactionEnvelope
                   , 54
                   ]
               }
-        , _fee = Fee { _fee = 100 }
-        , _seqNum = SequenceNumber { _sequenceNumber = 40695085712540286 }
+        , _fee = FeeStroops { _feeStroops = 100 }
+        , _seqNum =
+            SequenceNumber
+              { _sequenceNumber = NonNegativeInt64 (Refined 40695085712540286) }
         , _timeBounds = Nothing
         , _memo = MemoNone
         , _operations =
@@ -220,7 +222,7 @@ TransactionEnvelope
                                     , 56
                                     ]
                                 }
-                        , _amount = 50000000
+                        , _amount = NonNegativeInt64 (Refined 50000000)
                         }
                 }
             ]

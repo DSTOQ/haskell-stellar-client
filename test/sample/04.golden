@@ -70,8 +70,10 @@ TransactionEnvelope
                   , 99
                   ]
               }
-        , _fee = Fee { _fee = 100 }
-        , _seqNum = SequenceNumber { _sequenceNumber = 46373822751834113 }
+        , _fee = FeeStroops { _feeStroops = 100 }
+        , _seqNum =
+            SequenceNumber
+              { _sequenceNumber = NonNegativeInt64 (Refined 46373822751834113) }
         , _timeBounds = Nothing
         , _memo = MemoNone
         , _operations =
@@ -151,7 +153,7 @@ TransactionEnvelope
                                     , 56
                                     ]
                                 }
-                        , _limit = Just 9223372036854775807
+                        , _limit = NonNegativeInt64 (Refined 9223372036854775807)
                         }
                 }
             ]

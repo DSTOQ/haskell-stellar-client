@@ -70,8 +70,10 @@ TransactionEnvelope
                   , 99
                   ]
               }
-        , _fee = Fee { _fee = 500 }
-        , _seqNum = SequenceNumber { _sequenceNumber = 30381378881327023 }
+        , _fee = FeeStroops { _feeStroops = 500 }
+        , _seqNum =
+            SequenceNumber
+              { _sequenceNumber = NonNegativeInt64 (Refined 30381378881327023) }
         , _timeBounds = Nothing
         , _memo = MemoNone
         , _operations =
@@ -152,7 +154,7 @@ TransactionEnvelope
                                     ]
                                 }
                         , _buying = AssetNative
-                        , _amount = 290827
+                        , _amount = NonNegativeInt64 (Refined 290827)
                         , _price = Price { _numerator = 5025000 , _denominator = 157 }
                         , _offerId = OfferId { _offerId = 703126 }
                         }
@@ -234,7 +236,7 @@ TransactionEnvelope
                                     ]
                                 }
                         , _buying = AssetNative
-                        , _amount = 290827
+                        , _amount = NonNegativeInt64 (Refined 290827)
                         , _price = Price { _numerator = 5125000 , _denominator = 157 }
                         , _offerId = OfferId { _offerId = 703127 }
                         }
@@ -316,7 +318,7 @@ TransactionEnvelope
                                     ]
                                 }
                         , _buying = AssetNative
-                        , _amount = 290827
+                        , _amount = NonNegativeInt64 (Refined 290827)
                         , _price = Price { _numerator = 5225000 , _denominator = 157 }
                         , _offerId = OfferId { _offerId = 703128 }
                         }
@@ -398,7 +400,7 @@ TransactionEnvelope
                                     ]
                                 }
                         , _buying = AssetNative
-                        , _amount = 290827
+                        , _amount = NonNegativeInt64 (Refined 290827)
                         , _price = Price { _numerator = 5325000 , _denominator = 157 }
                         , _offerId = OfferId { _offerId = 703129 }
                         }
@@ -480,7 +482,7 @@ TransactionEnvelope
                                     ]
                                 }
                         , _buying = AssetNative
-                        , _amount = 290827
+                        , _amount = NonNegativeInt64 (Refined 290827)
                         , _price = Price { _numerator = 5425000 , _denominator = 157 }
                         , _offerId = OfferId { _offerId = 703130 }
                         }

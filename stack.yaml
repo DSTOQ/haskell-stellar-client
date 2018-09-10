@@ -37,16 +37,14 @@ packages:
 # - ../haskell-stellar-core
 - location:
     git: https://github.com/dstoq/haskell-stellar-core
-    commit: 2ccf5a7a1a77e7e67412fe7aa0a66cfc1fad2b27
+    commit: c77f167a2b9d37843e9d69aa00831cbce1cc3b0f
   extra-dep: true
 - .
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
-extra-deps:
-- base32-bytestring-0.2.1.0
-- bits-extras-0.1.3
+# extra-deps:
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
