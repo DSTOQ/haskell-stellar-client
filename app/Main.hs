@@ -104,7 +104,7 @@ repl = do
         Transaction
         { _sourceAccount = distributionAccount
         , _fee = FeeStroops . fromIntegral . unpack $ baseFee
-        , _seqNum = bumpSequenceNumber 2 srcSequenceNumber -- TODO: ?
+        , _seqNum = bumpSequenceNumber 2 srcSequenceNumber
         , _timeBounds = Nothing
         , _memo = MemoNone
         , _operations =
@@ -122,7 +122,7 @@ repl = do
         Transaction
         { _sourceAccount = issuingAccount
         , _fee = FeeStroops . fromIntegral . unpack $ baseFee
-        , _seqNum = bumpSequenceNumber 3 srcSequenceNumber -- TODO: ?
+        , _seqNum = bumpSequenceNumber 3 srcSequenceNumber
         , _timeBounds = Nothing
         , _memo = MemoNone
         , _operations =
@@ -165,14 +165,14 @@ readAssetCode = askInput
   (note "Invalid asset code" . makeAssetCode)
 
 readKeys :: Text -> REPL KeyPair
-readKeys tag = keyPair <$> readSecretKey tag <*> readPublicKey tag
+readKeys tag = flip keyPair <$> readPublicKey tag <*> readSecretKey tag
 
 readSecretKey :: Text -> REPL SecretKey
-readSecretKey tag = -- SC6ZH63HM2AB5M2RIUNMNRKM26KQTKWIKH4MY5PMTXBZPVOHCXB5FUNX
+readSecretKey tag =
   askInput ("[" <> tag <> "] Secret Key") (left show . parseSecretKey)
 
 readPublicKey :: Text -> REPL PublicKey
-readPublicKey tag = -- GCVXHAFVVRGBKHKPODVHBE4UENYCEARM2IK355YDNX5ZMXX3V7YIWBBI
+readPublicKey tag =
   askInput ("[" <> tag <> "] Public Key") (left show . parsePublicKey)
 
 askInput :: Text -> (Text -> Either Text a) -> REPL a

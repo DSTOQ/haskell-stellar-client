@@ -37,7 +37,7 @@ packages:
 # - ../haskell-stellar-core
 - location:
     git: https://github.com/dstoq/haskell-stellar-core
-    commit: c77f167a2b9d37843e9d69aa00831cbce1cc3b0f
+    commit: e281f2f1cfecdb2c08b4a36a63bfa40fba580026
   extra-dep: true
 - .
 
