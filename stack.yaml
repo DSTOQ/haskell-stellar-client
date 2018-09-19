@@ -34,11 +34,11 @@ resolver: lts-12.9
 #  - auto-update
 #  - wai
 packages:
-# - ../haskell-stellar-core
-- location:
-    git: https://github.com/dstoq/haskell-stellar-core
-    commit: 037118c8057ef522ab61a52e6fddd976f4891546
-  extra-dep: true
+- ../haskell-stellar-core
+# - location:
+#     git: https://github.com/dstoq/haskell-stellar-core
+#     commit: 037118c8057ef522ab61a52e6fddd976f4891546
+#   extra-dep: true
 - .
 
 # Dependency packages to be pulled from upstream that are not in the resolver

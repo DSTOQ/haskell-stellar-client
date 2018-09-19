@@ -2,74 +2,7 @@ TransactionEnvelope
   { _transaction =
       Transaction
         { _sourceAccount =
-            PublicKeyEd25519
-              { _publicKeyEd25519 =
-                  [ 97
-                  , 51
-                  , 50
-                  , 55
-                  , 53
-                  , 49
-                  , 57
-                  , 56
-                  , 51
-                  , 51
-                  , 55
-                  , 48
-                  , 57
-                  , 55
-                  , 55
-                  , 57
-                  , 99
-                  , 99
-                  , 51
-                  , 57
-                  , 98
-                  , 54
-                  , 52
-                  , 51
-                  , 102
-                  , 55
-                  , 57
-                  , 97
-                  , 52
-                  , 101
-                  , 97
-                  , 51
-                  , 51
-                  , 50
-                  , 97
-                  , 56
-                  , 98
-                  , 56
-                  , 55
-                  , 100
-                  , 100
-                  , 54
-                  , 49
-                  , 49
-                  , 49
-                  , 48
-                  , 51
-                  , 53
-                  , 51
-                  , 49
-                  , 57
-                  , 48
-                  , 57
-                  , 55
-                  , 50
-                  , 53
-                  , 51
-                  , 54
-                  , 51
-                  , 97
-                  , 57
-                  , 53
-                  , 101
-                  , 100
-                  ]
-              }
+            GCRSOUMYGNYJO6OMHG3EH542J2RTFKFYPXLBCEBVGGIJOJJWHKK62N6R
         , _fee = FeeStroops { _feeStroops = 500 }
         , _seqNum =
             SequenceNumber
@@ -84,75 +17,7 @@ TransactionEnvelope
                       ManageOfferOp
                         { _selling =
                             AssetCreditAlphanum
-                              AssetCode { _assetCode = "CNY" }
-                              PublicKeyEd25519
-                                { _publicKeyEd25519 =
-                                    [ 49
-                                    , 97
-                                    , 57
-                                    , 51
-                                    , 50
-                                    , 52
-                                    , 50
-                                    , 54
-                                    , 53
-                                    , 56
-                                    , 97
-                                    , 99
-                                    , 102
-                                    , 56
-                                    , 49
-                                    , 56
-                                    , 101
-                                    , 49
-                                    , 49
-                                    , 99
-                                    , 98
-                                    , 97
-                                    , 48
-                                    , 56
-                                    , 51
-                                    , 55
-                                    , 53
-                                    , 56
-                                    , 52
-                                    , 102
-                                    , 52
-                                    , 55
-                                    , 53
-                                    , 55
-                                    , 57
-                                    , 50
-                                    , 50
-                                    , 53
-                                    , 52
-                                    , 49
-                                    , 97
-                                    , 55
-                                    , 54
-                                    , 55
-                                    , 55
-                                    , 101
-                                    , 57
-                                    , 57
-                                    , 50
-                                    , 98
-                                    , 50
-                                    , 49
-                                    , 50
-                                    , 49
-                                    , 55
-                                    , 54
-                                    , 97
-                                    , 49
-                                    , 57
-                                    , 101
-                                    , 99
-                                    , 48
-                                    , 101
-                                    , 51
-                                    ]
-                                }
+                              CNY GANJGJBGLCWPQGHBDS5AQN2YJ5DVPERFIGTWO7UZFMQSC5VBT3AOGH6P
                         , _buying = AssetNative
                         , _amount = NonNegativeInt64 (Refined 80000000)
                         , _price = Price { _numerator = 2271 , _denominator = 10000 }
@@ -167,75 +32,7 @@ TransactionEnvelope
                         { _selling = AssetNative
                         , _buying =
                             AssetCreditAlphanum
-                              AssetCode { _assetCode = "USD" }
-                              PublicKeyEd25519
-                                { _publicKeyEd25519 =
-                                    [ 49
-                                    , 97
-                                    , 57
-                                    , 51
-                                    , 50
-                                    , 52
-                                    , 50
-                                    , 54
-                                    , 53
-                                    , 56
-                                    , 97
-                                    , 99
-                                    , 102
-                                    , 56
-                                    , 49
-                                    , 56
-                                    , 101
-                                    , 49
-                                    , 49
-                                    , 99
-                                    , 98
-                                    , 97
-                                    , 48
-                                    , 56
-                                    , 51
-                                    , 55
-                                    , 53
-                                    , 56
-                                    , 52
-                                    , 102
-                                    , 52
-                                    , 55
-                                    , 53
-                                    , 55
-                                    , 57
-                                    , 50
-                                    , 50
-                                    , 53
-                                    , 52
-                                    , 49
-                                    , 97
-                                    , 55
-                                    , 54
-                                    , 55
-                                    , 55
-                                    , 101
-                                    , 57
-                                    , 57
-                                    , 50
-                                    , 98
-                                    , 50
-                                    , 49
-                                    , 50
-                                    , 49
-                                    , 55
-                                    , 54
-                                    , 97
-                                    , 49
-                                    , 57
-                                    , 101
-                                    , 99
-                                    , 48
-                                    , 101
-                                    , 51
-                                    ]
-                                }
+                              USD GANJGJBGLCWPQGHBDS5AQN2YJ5DVPERFIGTWO7UZFMQSC5VBT3AOGH6P
                         , _amount = NonNegativeInt64 (Refined 60000000)
                         , _price = Price { _numerator = 2099 , _denominator = 10000 }
                         , _offerId = OfferId { _offerId = 0 }
@@ -248,75 +45,7 @@ TransactionEnvelope
                       ManageOfferOp
                         { _selling =
                             AssetCreditAlphanum
-                              AssetCode { _assetCode = "XRP" }
-                              PublicKeyEd25519
-                                { _publicKeyEd25519 =
-                                    [ 49
-                                    , 97
-                                    , 57
-                                    , 51
-                                    , 50
-                                    , 52
-                                    , 50
-                                    , 54
-                                    , 53
-                                    , 56
-                                    , 97
-                                    , 99
-                                    , 102
-                                    , 56
-                                    , 49
-                                    , 56
-                                    , 101
-                                    , 49
-                                    , 49
-                                    , 99
-                                    , 98
-                                    , 97
-                                    , 48
-                                    , 56
-                                    , 51
-                                    , 55
-                                    , 53
-                                    , 56
-                                    , 52
-                                    , 102
-                                    , 52
-                                    , 55
-                                    , 53
-                                    , 55
-                                    , 57
-                                    , 50
-                                    , 50
-                                    , 53
-                                    , 52
-                                    , 49
-                                    , 97
-                                    , 55
-                                    , 54
-                                    , 55
-                                    , 55
-                                    , 101
-                                    , 57
-                                    , 57
-                                    , 50
-                                    , 98
-                                    , 50
-                                    , 49
-                                    , 50
-                                    , 49
-                                    , 55
-                                    , 54
-                                    , 97
-                                    , 49
-                                    , 57
-                                    , 101
-                                    , 99
-                                    , 48
-                                    , 101
-                                    , 51
-                                    ]
-                                }
+                              XRP GANJGJBGLCWPQGHBDS5AQN2YJ5DVPERFIGTWO7UZFMQSC5VBT3AOGH6P
                         , _buying = AssetNative
                         , _amount = NonNegativeInt64 (Refined 60000000)
                         , _price = Price { _numerator = 1307 , _denominator = 5000 }
@@ -331,75 +60,7 @@ TransactionEnvelope
                         { _selling = AssetNative
                         , _buying =
                             AssetCreditAlphanum
-                              AssetCode { _assetCode = "XYG" }
-                              PublicKeyEd25519
-                                { _publicKeyEd25519 =
-                                    [ 49
-                                    , 97
-                                    , 57
-                                    , 51
-                                    , 50
-                                    , 52
-                                    , 50
-                                    , 54
-                                    , 53
-                                    , 56
-                                    , 97
-                                    , 99
-                                    , 102
-                                    , 56
-                                    , 49
-                                    , 56
-                                    , 101
-                                    , 49
-                                    , 49
-                                    , 99
-                                    , 98
-                                    , 97
-                                    , 48
-                                    , 56
-                                    , 51
-                                    , 55
-                                    , 53
-                                    , 56
-                                    , 52
-                                    , 102
-                                    , 52
-                                    , 55
-                                    , 53
-                                    , 55
-                                    , 57
-                                    , 50
-                                    , 50
-                                    , 53
-                                    , 52
-                                    , 49
-                                    , 97
-                                    , 55
-                                    , 54
-                                    , 55
-                                    , 55
-                                    , 101
-                                    , 57
-                                    , 57
-                                    , 50
-                                    , 98
-                                    , 50
-                                    , 49
-                                    , 50
-                                    , 49
-                                    , 55
-                                    , 54
-                                    , 97
-                                    , 49
-                                    , 57
-                                    , 101
-                                    , 99
-                                    , 48
-                                    , 101
-                                    , 51
-                                    ]
-                                }
+                              XYG GANJGJBGLCWPQGHBDS5AQN2YJ5DVPERFIGTWO7UZFMQSC5VBT3AOGH6P
                         , _amount = NonNegativeInt64 (Refined 10000000)
                         , _price = Price { _numerator = 73 , _denominator = 250 }
                         , _offerId = OfferId { _offerId = 0 }
@@ -413,75 +74,7 @@ TransactionEnvelope
                         { _selling = AssetNative
                         , _buying =
                             AssetCreditAlphanum
-                              AssetCode { _assetCode = "XLM" }
-                              PublicKeyEd25519
-                                { _publicKeyEd25519 =
-                                    [ 49
-                                    , 97
-                                    , 57
-                                    , 51
-                                    , 50
-                                    , 52
-                                    , 50
-                                    , 54
-                                    , 53
-                                    , 56
-                                    , 97
-                                    , 99
-                                    , 102
-                                    , 56
-                                    , 49
-                                    , 56
-                                    , 101
-                                    , 49
-                                    , 49
-                                    , 99
-                                    , 98
-                                    , 97
-                                    , 48
-                                    , 56
-                                    , 51
-                                    , 55
-                                    , 53
-                                    , 56
-                                    , 52
-                                    , 102
-                                    , 52
-                                    , 55
-                                    , 53
-                                    , 55
-                                    , 57
-                                    , 50
-                                    , 50
-                                    , 53
-                                    , 52
-                                    , 49
-                                    , 97
-                                    , 55
-                                    , 54
-                                    , 55
-                                    , 55
-                                    , 101
-                                    , 57
-                                    , 57
-                                    , 50
-                                    , 98
-                                    , 50
-                                    , 49
-                                    , 50
-                                    , 49
-                                    , 55
-                                    , 54
-                                    , 97
-                                    , 49
-                                    , 57
-                                    , 101
-                                    , 99
-                                    , 48
-                                    , 101
-                                    , 51
-                                    ]
-                                }
+                              XLM GANJGJBGLCWPQGHBDS5AQN2YJ5DVPERFIGTWO7UZFMQSC5VBT3AOGH6P
                         , _amount = NonNegativeInt64 (Refined 80000000)
                         , _price = Price { _numerator = 303 , _denominator = 1000 }
                         , _offerId = OfferId { _offerId = 0 }
@@ -491,11 +84,11 @@ TransactionEnvelope
         }
   , _signatures =
       [ DecoratedSignature
-          { _hint = SignatureHint [ 51 , 54 , 51 , 97 , 57 , 53 , 101 , 100 ]
+          { _hint = SignatureHint { _signatureHint = "363a95ed" }
           , _signature =
               Signature
                 { _signature =
-                    "[55,53,97,57,54,49,56,54,55,99,98,55,55,52,49,101,50,57,101,100,50,52,48,100,101,56,98,98,57,48,101,102,52,57,50,57,100,49,53,101,98,53,48,98,102,54,55,53,49,48,102,51,102,48,57,48,54,101,98,51,57,49,56,52,97,100,56,101,52,49,50,98,98,48,50,55,50,97,98,52,102,56,98,49,57,101,97,48,55,55,51,54,55,48,56,52,55,50,57,50,57,50,100,101,99,100,50,53,102,54,55,98,48,99,55,48,54,55,100,55,48,49,99,97,53,56,48,98]"
+                    "75a961867cb7741e29ed240de8bb90ef4929d15eb50bf67510f3f0906eb39184ad8e412bb0272ab4f8b19ea077367084729292decd25f67b0c7067d701ca580b"
                 }
           }
       ]

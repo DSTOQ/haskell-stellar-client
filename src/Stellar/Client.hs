@@ -1,7 +1,9 @@
 module Stellar.Client
   ( module Stellar.Client.Types
-  , module Stellar.Monad
+  , module Control.Monad.Stellar
+  , module Control.Monad.Trans.Stellar
   ) where
 
-import           Stellar.Client.Types
-import           Stellar.Monad
+import Control.Monad.Stellar
+import Control.Monad.Trans.Stellar
+import Stellar.Client.Types
