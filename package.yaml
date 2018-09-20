@@ -82,16 +82,29 @@ executables:
 library:
   source-dirs: src
   dependencies:
+    - aeson
     - base >= 4.9 && < 5
     - binary
     - bytestring
     - base64-bytestring
+    - exceptions
     - extra
+    - http-client
+    - lens
+    - modern-uri
+    - mtl
+    - newtype
     - protolude
+    - req
     - stellar-core
+    - transformers
+    - transformers-lift
   exposed-modules:
+    - Control.Monad.Rest
+    - Control.Monad.Trans.Rest
+    - Control.Monad.Stellar
+    - Control.Monad.Trans.Stellar
     - Stellar.Client
-    - Stellar.Monad
     - Stellar.Parser
     - Stellar.Printer
 
