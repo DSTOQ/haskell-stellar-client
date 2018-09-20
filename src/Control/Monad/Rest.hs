@@ -45,3 +45,4 @@ class MonadThrow m => MonadRest m where
   get = lift . get
 
 instance MonadRest m => MonadRest (ReaderT r m)
+instance MonadRest m => MonadRest (ExceptT e m)
