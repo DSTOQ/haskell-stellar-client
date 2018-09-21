@@ -3,7 +3,7 @@
 
 module Stellar.Client.Types
   ( Account (..)
-  , AccountId
+  , AccountId (..)
   , printAccountId
   , AccountFlag
   , Balance
