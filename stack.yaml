@@ -18,7 +18,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-12.9
+resolver: lts-12.10
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -37,14 +37,15 @@ packages:
 # - ../haskell-stellar-core
 - location:
     git: https://github.com/dstoq/haskell-stellar-core
-    commit: 5a6419a1047078ed83ba819e87e140bf72f69cd8
+    commit: 213e5580e65ef3de5cc3f0f9ef373a4bfa3be8f2
   extra-dep: true
 - .
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
-# extra-deps:
+extra-deps:
+- named-0.2.0.0
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

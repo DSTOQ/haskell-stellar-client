@@ -4,9 +4,7 @@ TransactionEnvelope
         { _sourceAccount =
             GCHKFPTNHLM7N46QG3RZ7JZ3FDMSBBZ4YEFLF6I6ZQQCFXYA47A2KCQI
         , _fee = FeeStroops { _feeStroops = 100 }
-        , _seqNum =
-            SequenceNumber
-              { _sequenceNumber = NonNegativeInt64 (Refined 43876020096336346) }
+        , _seqNum = 43876020096336346
         , _timeBounds = Nothing
         , _memo =
             MemoHash

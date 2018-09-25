@@ -252,9 +252,11 @@ language_extensions:
 - MultiWayIf
 - NamedFieldPuns
 - NoImplicitPrelude
+- OverloadedLabels
 - OverloadedStrings
 - PatternSynonyms
 - RankNTypes
+- RecordWildCards
 - ScopedTypeVariables
 - StandaloneDeriving
 - TupleSections
@@ -262,3 +264,4 @@ language_extensions:
 - TypeFamilies
 - TypeFamilyDependencies
 - TypeOperators
+- ViewPatterns

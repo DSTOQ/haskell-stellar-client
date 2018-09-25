@@ -49,9 +49,11 @@ default-extensions:
 - MultiWayIf
 - NamedFieldPuns
 - NoImplicitPrelude
+- OverloadedLabels
 - OverloadedStrings
 - PatternSynonyms
 - RankNTypes
+- RecordWildCards
 - ScopedTypeVariables
 - StandaloneDeriving
 - TupleSections
@@ -59,6 +61,7 @@ default-extensions:
 - TypeFamilies
 - TypeFamilyDependencies
 - TypeOperators
+- ViewPatterns
 
 executables:
   stellar-client:
@@ -89,14 +92,17 @@ library:
     - base64-bytestring
     - exceptions
     - extra
-    - http-client
+    - http-api-data
+    - http-conduit
+    - http-types
     - lens
-    - modern-uri
+    - network-uri
     - mtl
+    - named
     - newtype
     - protolude
-    - req
     - stellar-core
+    - text
     - transformers
     - transformers-lift
   exposed-modules:

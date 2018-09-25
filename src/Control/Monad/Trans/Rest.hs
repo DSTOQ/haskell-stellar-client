@@ -3,20 +3,20 @@ module Control.Monad.Trans.Rest
   , runRestT
   ) where
 
-import           Control.Lens
-import           Control.Monad.Catch            (MonadThrow, throwM)
-import           Control.Monad.Rest             (ApiBase, MonadRest (..),
-                                                 resourceUri)
+import           Network.HTTP.Simple
+import           Network.HTTP.Types
+import           Network.URI
+import           Protolude
+
+import           Control.Monad.Catch            (MonadThrow)
+import           Control.Monad.Rest             (ApiBase (..), MonadRest (..),
+                                                 RelativeRes (..))
 import           Control.Monad.Trans            (MonadTrans)
 import           Control.Monad.Trans.Lift.Catch (LiftCatch)
 import           Control.Monad.Trans.Lift.StT   (StT)
 import           Control.Newtype                (Newtype, pack, unpack)
-import           Data.Aeson                     (Result (..), fromJSON)
-import           Network.HTTP.Client            (HttpException (InvalidUrlException))
-import           Network.HTTP.Req
-import           Protolude
-import           Text.URI
-import qualified Text.URI.Lens                  as L
+import qualified Data.Text                      as T
+
 
 newtype RestT m a
   = RestT (ReaderT ApiBase m a)
@@ -39,31 +39,26 @@ type instance StT RestT a = a
 runRestT :: ApiBase -> RestT m a -> m a
 runRestT base  = flip runReaderT base . unpack
 
-instance MonadIO m => MonadHttp (RestT m) where
-  handleHttpException = throwIO
+uriRequest :: ApiBase -> RelativeRes -> Request
+uriRequest base res =
+  setRequestPath pathBs
+  $ setRequestSecure (_scheme base == "https")
+  $ setRequestHost hostBs
+  defaultRequest
+  where
+    hostBs = toS $ printUriAuth $ _authority base
+    printUriAuth Nothing  = mempty
+    printUriAuth (Just a) = mconcat [uriUserInfo a, uriRegName a, uriPort a]
+    pathBs = toS $ mconcat
+      [ T.intercalate "/" (_path res)
+      , T.concat $ "?" : intersperse "&" (kv <$> _query res)
+      , maybe "" (mappend "#") (_fragment res)
+      ]
+    kv :: (Text, Text) -> Text
+    kv (k, v) = k <> "=" <> v
 
 instance (MonadThrow m, MonadIO m) => MonadRest (RestT m) where
   get resource = do
-    uri <- asks (`resourceUri` resource)
-    response <- withUri uri $ \u -> req GET u NoReqBody jsonResponse mempty
-    case fromJSON (responseBody response) of
-      Error s   -> throwM (JsonHttpException s)
-      Success a -> return a
-
-withUri :: MonadThrow m => URI -> (forall s . Url s -> m r) -> m r
-withUri uri f = fromMaybe err $ urlHttps <|> urlHttp
-  where
-  err = throwM $ InvalidUrlException (renderStr uri) "Invalid URL scheme"
-  urlHttp = fmap f (toUrlHttp uri >>= (<$> host))
-  urlHttps = fmap f (toUrlHttps uri >>= (<$> host))
-  host = unRText <$> uri ^? (L.uriAuthority . _Right  . L.authHost)
-
-toUrlHttp :: URI -> Maybe (Text -> Url 'Http)
-toUrlHttp uri = uriScheme uri <&> unRText & \case
-  Just "http" -> Just http
-  _ -> Nothing
-
-toUrlHttps :: URI -> Maybe (Text -> Url 'Https)
-toUrlHttps uri = uriScheme uri <&> unRText & \case
-  Just "https" -> Just https
-  _ -> Nothing
+    request <- asks (`uriRequest` resource)
+    response <- httpJSON $ setRequestMethod methodGet request
+    return $ getResponseBody response

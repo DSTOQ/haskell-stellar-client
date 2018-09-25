@@ -1,20 +1,24 @@
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData      #-}
 
 module Stellar.Client.Types
-  ( Account (..)
+  ( AccountDetails (..)
   , AccountId (..)
   , printAccountId
-  , AccountFlag
+  , AccountFlags
   , Balance
+  , Cursor
+  , Order (..)
   , Liabilities
+  , TransactionDetails (..)
   ) where
 
 import Control.Monad    (fail)
 import Control.Newtype
 import Data.Aeson.Types
+import Data.Char        (isDigit)
 import Protolude
 import Stellar
+import Web.HttpApiData  (ToHttpApiData (..))
 
 newtype AccountId
   = AccountId PublicKey
@@ -28,16 +32,14 @@ printAccountId :: AccountId -> Text
 printAccountId = printPublicKey . unpack
 
 
-data AccountFlag
+data AccountFlags
   = AccountFlag
-   { _authImmutable :: Bool
-   , _authRequired  :: Bool
+   { _authRequired  :: Bool
    , _authRevocable :: Bool
    } deriving (Eq, Show)
 
-instance FromJSON AccountFlag where
+instance FromJSON AccountFlags where
   parseJSON = withObject "Account Flag" $ \o -> do
-    _authImmutable <- o .: "auth_immutable"
     _authRequired  <- o .: "auth_required"
     _authRevocable <- o .: "auth_revocable"
     return $ AccountFlag {..}
@@ -60,11 +62,12 @@ data Balance
 
 instance FromJSON Balance where
   parseJSON = withObject "Balance" $ \o -> do
-    _balance <- o .: "balance"
-    buying <- readJsonString o "buying_liabilities"
-    selling <- readJsonString o "selling_liabilities"
+    _balance <- Stroop <$> readStellarStupidStringAsInt64 o "balance"
+    buying <- readStellarStupidStringAsInt64 o "buying_liabilities"
+    selling <- readStellarStupidStringAsInt64 o "selling_liabilities"
     let _liabilities = Liabilities buying selling
-    _limit <- o .: "limit"
+    limit <- o .:? "limit"
+    _limit <- traverse (maybe (fail "Invalid limit") pure  . readMaybe) limit
     let readCreditAlphanum = AssetCreditAlphanum
           <$> o .: "asset_code"
           <*> o .: "asset_issuer"
@@ -74,11 +77,10 @@ instance FromJSON Balance where
       PreciseAssetTypeCreditAlphanum12 -> readCreditAlphanum
     return Balance {..}
 
-readJsonString :: Read a => Object -> Text -> Parser a
-readJsonString o key = do
-  str <- o .: key
-  maybe (fail ("Invalid " <> toS key)) pure (readMaybe str)
-
+readStellarStupidStringAsInt64 :: Object -> Text -> Parser Int64
+readStellarStupidStringAsInt64 o key = do
+  numStr <- o .: key
+  maybe (fail ("Invalid " <> toS key)) pure $ readMaybe $ filter isDigit numStr
 
 data Thresholds
   = Thresholds
@@ -94,21 +96,21 @@ instance FromJSON Thresholds where
     <*> o .: "high_threshold"
 
 
-data Account
-  = Account
+data AccountDetails
+  = AccountDetails
   { _id             :: AccountId
   , _publicKey      :: PublicKey
   , _sequenceNumber :: SequenceNumber
   , _subentryCount  :: Word32
   , _thresholds     :: Thresholds
   , _balances       :: [Balance]
-  , _flags          :: [AccountFlag]
+  , _flags          :: AccountFlags
   , _signers        :: [Signer]
-  , _data           :: DataValue
+  , _data           :: Map Text DataValue
   } deriving (Eq, Show, Generic)
 
-instance FromJSON Account where
-  parseJSON = withObject "Account" $ \o -> do
+instance FromJSON AccountDetails where
+  parseJSON = withObject "AccountDetails" $ \o -> do
     _id             <- o .: "id"
     _publicKey      <- o .: "account_id"
     _sequenceNumber <- o .: "sequence"
@@ -118,4 +120,33 @@ instance FromJSON Account where
     _flags          <- o .: "flags"
     _signers        <- o .: "signers"
     _data           <- o .: "data"
-    return Account {..}
+    return AccountDetails {..}
+
+
+newtype Cursor
+  = Cursor Text
+  deriving (Eq, Show, FromJSON, ToHttpApiData)
+
+data Order
+  = Ascending | Descending
+  deriving (Eq, Show)
+
+instance ToHttpApiData Order where
+  toUrlPiece = \case
+    Ascending -> "asc"
+    Descending -> "desc"
+
+newtype TransactionId
+  = TransactionId Sha256
+  deriving (Eq, Show, FromJSON)
+
+
+newtype TransactionDetails
+  = TransactionDetails
+  { _id :: TransactionId
+  } deriving (Eq, Show, Generic)
+
+instance FromJSON TransactionDetails where
+  parseJSON = withObject "TransactionDetails" $ \o -> do
+    _id <- o .: "id"
+    return TransactionDetails {..}

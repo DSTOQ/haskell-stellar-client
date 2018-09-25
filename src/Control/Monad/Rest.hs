@@ -1,38 +1,46 @@
-{-# LANGUAGE DefaultSignatures #-}
-
 module Control.Monad.Rest
   ( MonadRest (..)
   , ApiBase (..)
+  , apiBase
   , RelativeRes (..)
-  , emptyRelativeRes
-  , resourceUri
+  , relativeRes
   ) where
+
+import Named
+import Network.URI
+import Protolude           hiding (get)
 
 import Control.Monad.Catch (MonadThrow)
 import Control.Monad.Trans (MonadTrans)
-import Data.Aeson.Types
-import Protolude           hiding (get)
-import Text.URI
+import Data.Aeson.Types    hiding (String)
 
 
 data ApiBase
   = ApiBase
-  { scheme    :: Maybe (RText 'Scheme)
-  , authority :: Either Bool Authority
+  { _scheme    :: Text
+  , _authority :: Maybe URIAuth
   } deriving (Eq, Show)
 
 data RelativeRes
   = RelativeRes
-  { path     :: Maybe (Bool, NonEmpty (RText 'PathPiece))
-  , query    :: [QueryParam]
-  , fragment :: Maybe (RText 'Fragment)
+  { _path     :: [Text]
+  , _query    :: [(Text, Text)]
+  , _fragment :: Maybe Text
   } deriving (Eq, Show)
 
-emptyRelativeRes :: RelativeRes
-emptyRelativeRes = RelativeRes Nothing mempty Nothing
+apiBase :: URI -> ApiBase
+apiBase uri = ApiBase (toS $ uriScheme uri) (uriAuthority uri)
 
-resourceUri :: ApiBase -> RelativeRes -> URI
-resourceUri b r = URI (scheme b) (authority b) (path r) (query r) (fragment r)
+relativeRes
+  :: "path" :? [Text]
+  -> "query" :? [(Text, Text)]
+  -> "fragment" :? Maybe Text
+  -> RelativeRes
+relativeRes
+  (argDef #path [] -> p)
+  (argDef #query [] -> q)
+  (argDef #fragment Nothing -> f)
+  = RelativeRes p q f
 
 class MonadThrow m => MonadRest m where
   get :: FromJSON v => RelativeRes -> m v
