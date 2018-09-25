@@ -2,7 +2,7 @@
 
 module Control.Monad.Stellar
   ( MonadStellar
-  , account
+  , accountDetails
   , accountTransactions
   ) where
 
@@ -16,28 +16,28 @@ import Control.Monad.Trans.RWS    (RWST)
 import Control.Monad.Trans.Writer (WriterT)
 
 class Monad m => MonadStellar m where
-  account :: AccountId -> m AccountDetails
-  default account
+  accountDetails :: AccountId -> m AccountDetails
+  default accountDetails
     :: (MonadTrans t, MonadStellar m1, m ~ t m1)
     => AccountId
     -> m AccountDetails
-  account = lift . account
+  accountDetails = lift . accountDetails
 
   accountTransactions
     :: AccountId
     -> "cursor" :? Maybe Cursor
-    -> "order"  :? Maybe Order
+    -> "order"  :? Maybe SortOrder
     -> "limit"  :? Maybe Int
     -> m ([TransactionDetails], Cursor)
   default accountTransactions
     :: (MonadTrans t, MonadStellar m1, m ~ t m1)
     => AccountId
     -> "cursor" :? Maybe Cursor
-    -> "order"  :? Maybe Order
+    -> "order"  :? Maybe SortOrder
     -> "limit"  :? Maybe Int
     -> m ([TransactionDetails], Cursor)
   accountTransactions acc
-    (argDef #cursor Nothing -> cursor) 
+    (argDef #cursor Nothing -> cursor)
     (argDef #order  Nothing -> order)
     (argDef #limit  Nothing -> limit)
     = lift $ accountTransactions acc

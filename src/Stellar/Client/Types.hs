@@ -1,15 +1,18 @@
 {-# LANGUAGE StrictData      #-}
 
 module Stellar.Client.Types
-  ( AccountDetails (..)
+  ( AccountDetails
   , AccountId (..)
   , printAccountId
   , AccountFlags
   , Balance
   , Cursor
-  , Order (..)
+  , SortOrder (..)
   , Liabilities
-  , TransactionDetails (..)
+  , TransactionDetails
+  , TransactionId (..)
+  , Thresholds
+  , Ledger (..)
   ) where
 
 import Control.Monad    (fail)
@@ -106,7 +109,7 @@ data AccountDetails
   , _balances       :: [Balance]
   , _flags          :: AccountFlags
   , _signers        :: [Signer]
-  , _data           :: Map Text DataValue
+  , _dataValues     :: Map Text DataValue
   } deriving (Eq, Show, Generic)
 
 instance FromJSON AccountDetails where
@@ -119,7 +122,7 @@ instance FromJSON AccountDetails where
     _thresholds     <- o .: "thresholds"
     _flags          <- o .: "flags"
     _signers        <- o .: "signers"
-    _data           <- o .: "data"
+    _dataValues     <- o .: "data"
     return AccountDetails {..}
 
 
@@ -127,26 +130,32 @@ newtype Cursor
   = Cursor Text
   deriving (Eq, Show, FromJSON, ToHttpApiData)
 
-data Order
+data SortOrder
   = Ascending | Descending
   deriving (Eq, Show)
 
-instance ToHttpApiData Order where
+instance ToHttpApiData SortOrder where
   toUrlPiece = \case
     Ascending -> "asc"
     Descending -> "desc"
 
 newtype TransactionId
   = TransactionId Sha256
-  deriving (Eq, Show, FromJSON)
+  deriving (Eq, Show, Read, FromJSON)
 
+newtype Ledger
+  = Ledger Int64
+  deriving (Eq, Show, Read, FromJSON)
 
-newtype TransactionDetails
+data TransactionDetails
   = TransactionDetails
   { _id :: TransactionId
+  , _ledger :: Ledger
+  -- TODO: other fields
   } deriving (Eq, Show, Generic)
 
 instance FromJSON TransactionDetails where
   parseJSON = withObject "TransactionDetails" $ \o -> do
     _id <- o .: "id"
+    _ledger <- o .: "ledger"
     return TransactionDetails {..}

@@ -111,6 +111,7 @@ library:
     - Control.Monad.Stellar
     - Control.Monad.Trans.Stellar
     - Stellar.Client
+    - Stellar.Client.Lenses
     - Stellar.Parser
     - Stellar.Printer
 

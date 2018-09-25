@@ -35,12 +35,12 @@ instance Newtype (StellarT m a) (m a) where
   pack = StellarT
 
 instance MonadRest m => MonadStellar (StellarT m) where
-  account accountId = lift $ Rest.get $ relativeRes
+  accountDetails accountId = lift $ Rest.get $ relativeRes
     ! #path ["accounts", printAccountId accountId]
     ! defaults
 
   accountTransactions accountId
-    (argDef #cursor Nothing -> cursor) 
+    (argDef #cursor Nothing -> cursor)
     (argDef #order  Nothing -> order)
     (argDef #limit  Nothing -> limit)
      = lift $ Rest.get $ relativeRes
